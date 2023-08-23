@@ -19,6 +19,11 @@ public class MemberService {
     @Transactional
     public void signUp(MemberRequestDto dto) throws Exception {
         validateDuplicateEmail(dto.getEmail());
+
+        if(!dto.getPassword().equals(dto.getPasswordConfirm())){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
         memberRepository.save(Member.createMember(dto));
     }
 

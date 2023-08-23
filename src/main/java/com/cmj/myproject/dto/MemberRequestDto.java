@@ -18,12 +18,16 @@ public class MemberRequestDto {
     @NotEmpty(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
+    @NotEmpty(message = "비밀번호 확인은 필수 입력 값입니다.")
+    private String passwordConfirm;
+
     @NotEmpty(message = "이름은 필수 입력 값입니다.")
     private String name;
 
-    public MemberRequestDto(String email, String password, String name) {
+    public MemberRequestDto(String email, String password, String passwordConfirm, String name) {
         this.email = email;
         this.password = password;
+        this.passwordConfirm = passwordConfirm;
         this.name = name;
     }
 

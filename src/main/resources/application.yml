@@ -9,7 +9,7 @@ spring:
       matching-strategy: ant_path_matcher
 
   thymeleaf:
-    prefix: classpath:/static/
+    prefix: classpath:/templates/
     suffix: .html
 
   jpa:
