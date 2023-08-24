@@ -4,12 +4,15 @@ import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Slf4j
@@ -25,12 +28,12 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ModelAndView signUp(@ModelAttribute @Valid MemberRequestDto dto, BindingResult result) throws Exception {
+    public ModelAndView signUp(@ModelAttribute @Valid MemberRequestDto dto, BindingResult result, HttpSession session) throws Exception {
         ModelAndView mv = new ModelAndView();
 
         if (result.hasErrors()) {
             mv.setViewName("member/signup");
-            mv.addObject("errors", result.getAllErrors());
+            mv.addObject("error", result.getAllErrors());
         } else {
             try {
                 memberService.signUp(dto);
@@ -39,11 +42,13 @@ public class MemberController {
                 mv.setViewName("member/signup");
                 mv.addObject("error", e.getMessage());
             }
+
         }
 
         mv.addObject("dto", dto);
         return mv;
     }
+
 
 
 }

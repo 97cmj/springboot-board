@@ -29,7 +29,7 @@ public class MemberService {
 
     private void validateDuplicateEmail(String email) throws Exception {
         if(memberRepository.existsByEmail(email)){
-            throw new DuplicateEmailException();
+            throw new IllegalArgumentException("중복된 이메일이 존재합니다.");
         }
     }
 
