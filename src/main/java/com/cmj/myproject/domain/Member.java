@@ -4,11 +4,13 @@ package com.cmj.myproject.domain;
 import com.cmj.myproject.dto.MemberRequestDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@ToString
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

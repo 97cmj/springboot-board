@@ -23,8 +23,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/signup")
-    public String signUpForm(){
-        return "member/signup";
+    public ModelAndView signUpForm(){
+        return new ModelAndView("member/signup");
     }
 
     @PostMapping("/signup")
@@ -48,6 +48,29 @@ public class MemberController {
         mv.addObject("dto", dto);
         return mv;
     }
+
+    @GetMapping("/login")
+    public ModelAndView loginForm(){
+        return new ModelAndView("member/login");
+    }
+
+    @PostMapping("/login")
+    public ModelAndView login(@ModelAttribute MemberRequestDto dto, HttpSession session) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        try {
+            memberService.login(dto);
+            session.setAttribute("loginUser", dto.getEmail());
+            mv.setViewName("redirect:/login");
+        } catch (IllegalArgumentException e) {
+            mv.setViewName("member/login");
+            mv.addObject("error", e.getMessage());
+        }
+
+        return mv;
+    }
+
+
 
 
 

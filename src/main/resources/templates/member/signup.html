@@ -30,6 +30,12 @@
                                     <input th:value="*{dto?.getName()}" class="form-control" id="name" name="name" type="text" required>
                                     <label for="name">이름</label>
                                 </div>
+                                <div class="form-floating mb-3">
+                                    <p th:if="${error}" th:text="${error}"></p>
+                                </div>
+
+
+
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary">회원가입</button>
                                     <button type="button" class="btn btn-secondary"
