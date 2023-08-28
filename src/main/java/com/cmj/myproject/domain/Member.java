@@ -1,37 +1,37 @@
 package com.cmj.myproject.domain;
 
-
-import com.cmj.myproject.dto.MemberRequestDto;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.List;
 
-@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
-@ToString
-public class Member {
+@Entity
+@Builder
+public class Member extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false)
     private Long id;
-    @Column(length = 50, nullable = false)
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(length = 50, nullable = false)
+
+    @Column
     private String password;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "name")
     private String name;
 
-    public Member() {}
 
-    public Member(MemberRequestDto dto) {
-        this.email = dto.getEmail();
-        this.name = dto.getName();
-        this.password = dto.getPassword();
-    }
-
-    public static Member createMember(MemberRequestDto dto){
-        return new Member(dto);
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("user"));
     }
 }

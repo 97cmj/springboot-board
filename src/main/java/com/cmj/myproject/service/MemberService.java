@@ -7,9 +7,13 @@ import com.cmj.myproject.repository.MemberRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,8 @@ import org.thymeleaf.util.StringUtils;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
@@ -26,6 +32,15 @@ public class MemberService {
         if (!StringUtils.equals(dto.getPassword(), dto.getPasswordConfirm())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+
+        Member member = Member.builder()
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .name(dto.getName())
+                .build();
+
+        memberRepository.save(member);
+
     }
 
     private void validateDuplicateEmail(String email) throws Exception {
@@ -37,13 +52,14 @@ public class MemberService {
 
     public void login(MemberRequestDto dto) {
 
-        Member member = memberRepository.findByEmail(dto.getEmail());
+        Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
 
-        if(member == null){
+        if (Objects.equals(member, null)) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
 
-        log.info(String.valueOf(member));
+
+
 
 
 

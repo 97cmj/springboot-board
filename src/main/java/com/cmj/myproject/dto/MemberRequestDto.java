@@ -1,6 +1,7 @@
 package com.cmj.myproject.dto;
 
 import com.cmj.myproject.domain.Member;
+import com.cmj.myproject.domain.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,14 +26,6 @@ public class MemberRequestDto {
 
     @NotEmpty(message = "이름은 필수 입력 값입니다.")
     private String name;
-
-    public MemberRequestDto(String email, String password, String passwordConfirm, String name) {
-        this.email = email;
-        this.password = password;
-        this.passwordConfirm = passwordConfirm;
-        this.name = name;
-    }
-
 
 
 }
