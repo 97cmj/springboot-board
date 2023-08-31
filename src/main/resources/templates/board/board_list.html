@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+    <main>
+        <div class="sb-nav-fixed">
+            <div class="mt-5 pt-5">
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Board</h1>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <a class="btn btn-primary float-end" href="/board/write">
+                                <!-- <i class="fas fa-table me-1"></i> -->
+                                <i class="fas fa-edit"></i> 글 작성
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                <tr>
+                                    <th>제목</th>
+                                    <th>작성자</th>
+                                    <th>조회수</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- 반복문을 사용하여 게시글 데이터 출력 -->
+                                <tr th:each="b : ${board}">
+                                    <td>
+                                        <span th:text="${b.title}"></span>
+                                        (<span style="color: red;" th:text="${b.replyCnt}"></span>)
+                                    </td>
+                                    <td th:text="${b.writer}"></td>
+                                    <td th:text="${b.viewCnt}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</th:block>
+</html>

@@ -7,7 +7,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @ToString
@@ -19,4 +18,8 @@ public class MemberAdapter extends User {
         super(member.getEmail(), member.getPassword(), List.of(new SimpleGrantedAuthority(member.getAuthorities().toString())));
         this.member = member;
     }
+
+
+
+
 }

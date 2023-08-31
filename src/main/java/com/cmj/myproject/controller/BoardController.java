@@ -1,14 +1,21 @@
 package com.cmj.myproject.controller;
 
+import com.cmj.myproject.config.security.MemberAdapter;
 import com.cmj.myproject.domain.Board;
+import com.cmj.myproject.domain.Member;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
+@Slf4j
 @Controller
+@RequestMapping("/board")
 public class BoardController {
 
-    @RequestMapping("/board")
+    @RequestMapping("")
     public String board(Model model) {
 
         Board b = Board.builder()
@@ -22,7 +29,20 @@ public class BoardController {
 
         model.addAttribute("board", b);
 
-        return "board/boardList";
+        return "board/board_list";
+    }
+
+    @RequestMapping("/write")
+    public ModelAndView write(@AuthenticationPrincipal MemberAdapter memberAdapter, ModelAndView mv) {
+        Member m = (memberAdapter != null) ? memberAdapter.getMember() : null;
+
+        if (m == null) {
+            m = new Member(1L, "anonymous", "1", "anonymous");
+        }
+        mv.addObject("m", m);
+
+        mv.setViewName("board/board_write");
+        return mv;
     }
 
 }
