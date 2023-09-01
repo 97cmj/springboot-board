@@ -34,11 +34,8 @@ public class BoardController {
 
     @RequestMapping("/write")
     public ModelAndView write(@AuthenticationPrincipal MemberAdapter memberAdapter, ModelAndView mv) {
-        Member m = (memberAdapter != null) ? memberAdapter.getMember() : null;
+        Member m = (memberAdapter != null) ? memberAdapter.getMember() : MemberAdapter.createAnonymousMember();
 
-        if (m == null) {
-            m = new Member(1L, "anonymous", "1", "anonymous");
-        }
         mv.addObject("m", m);
 
         mv.setViewName("board/board_write");

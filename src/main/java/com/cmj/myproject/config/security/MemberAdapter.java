@@ -19,6 +19,10 @@ public class MemberAdapter extends User {
         this.member = member;
     }
 
+    public static Member createAnonymousMember() {
+        return new Member(1L, "anonymous@gmail.com", "", "익명");
+    }
+
 
 
 

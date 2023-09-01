@@ -18,7 +18,7 @@ public class MainController {
 
     @RequestMapping("/")
     public String main(@AuthenticationPrincipal MemberAdapter memberAdapter, Model model) {
-        Member m = memberAdapter.getMember();
+        Member m = (memberAdapter != null) ? memberAdapter.getMember() : MemberAdapter.createAnonymousMember();
 
         model.addAttribute("name", m.getName());
         return "main/main";
