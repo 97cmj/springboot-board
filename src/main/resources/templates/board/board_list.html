@@ -27,12 +27,14 @@
                                 <tbody>
                                 <!-- 반복문을 사용하여 게시글 데이터 출력 -->
                                 <tr th:each="b : ${board}">
+                                    <td style="display: none" th:text="${b.id}"></td>
                                     <td>
                                         <span th:text="${b.title}"></span>
                                         (<span style="color: red;" th:text="${b.replyCnt}"></span>)
                                     </td>
                                     <td th:text="${b.writer}"></td>
                                     <td th:text="${b.viewCnt}"></td>
+
                                 </tr>
                                 </tbody>
                             </table>
@@ -41,6 +43,17 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            $(document).ready(function () {
+                $("tr").click(function () {
+                    var id = $(this).find("td:eq(0)").text();
+                    location.href = "/board/" + id;
+                });
+            });
+
+        </script>
+
     </main>
 </th:block>
 </html>

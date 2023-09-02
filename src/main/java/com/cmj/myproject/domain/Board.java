@@ -1,19 +1,18 @@
 package com.cmj.myproject.domain;
 
+import com.cmj.myproject.dto.BoardResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
 public class Board extends BaseEntity {
 
     @Id
@@ -38,6 +37,18 @@ public class Board extends BaseEntity {
 
     @Column(name = "reply_cnt", nullable = false)
     private int replyCnt;
+
+    public BoardResponseDto toDto() {
+        return BoardResponseDto.builder()
+                .id(id)
+                .title(title)
+                .content(content)
+                .writer(writer)
+                .viewCnt(viewCnt)
+                .recommendCnt(recommendCnt)
+                .replyCnt(replyCnt)
+                .build();
+    }
 
 
 }
