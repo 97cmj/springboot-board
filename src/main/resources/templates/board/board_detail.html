@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+    <main>
+        <div class="sb-nav-fixed">
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Board</h1>
 
-</body>
+                <!-- 게시글 상세 정보를 표시할 카드 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <a class="btn btn-primary float-end" href="/board/write">
+                            <i class="fas fa-edit"></i> 글 작성
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h2 th:text="${b.title}"></h2>
+                        <p>작성자: <span th:text="${b.writer}"></span></p>
+                        <p>조회수: <span th:text="${b.viewCnt}"></span></p>
+                        <p>내용: <span th:text="${b.content}"></span></p>
+                    </div>
+                </div>
+
+                <!-- 댓글 표시 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>댓글</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- 댓글 리스트를 표시하는 부분 -->
+                        <ul class="list-group">
+                            <!--                            <li th:each="comment : ${board.comments}" class="list-group-item">-->
+                            <!--                                <p th:text="${comment.content}"></p>-->
+                            <!--                            </li>-->
+                        </ul>
+
+                        <!-- 댓글 작성 폼 -->
+                        <form th:action="@{/board/comment}" method="post">
+                            <input type="hidden" name="boardId">
+                            <div class="form-group">
+                                <textarea class="form-control" name="content" placeholder="댓글 작성" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">댓글 작성</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</th:block>
 </html>

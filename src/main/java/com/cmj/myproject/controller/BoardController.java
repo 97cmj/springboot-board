@@ -3,6 +3,7 @@ package com.cmj.myproject.controller;
 import com.cmj.myproject.config.security.MemberAdapter;
 import com.cmj.myproject.domain.Board;
 import com.cmj.myproject.domain.Member;
+import com.cmj.myproject.dto.BoardRequestDto;
 import com.cmj.myproject.dto.BoardResponseDto;
 import com.cmj.myproject.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -28,17 +32,9 @@ public class BoardController {
     @GetMapping("")
     public String board(Model model) {
 
-        Board b = Board.builder()
-                .id(1L)
-                .title("제목")
-                .content("내용")
-                .writer("작성자")
-                .viewCnt(0)
-                .recommendCnt(0)
-                .replyCnt(0)
-                .build();
+        List<BoardResponseDto> b = boardService.findAllBoard();
 
-        model.addAttribute("board", b);
+        model.addAttribute("b", b);
 
         return "board/board_list";
     }
@@ -54,18 +50,18 @@ public class BoardController {
     }
 
     @PostMapping("/write")
-    public ResponseEntity<?> write(BoardResponseDto dto) {
-        log.info("dto: {}", dto);
-        return ResponseEntity.ok().build();
-    }
+    public String write(BoardRequestDto dto, HttpServletResponse response) {
 
+        BoardResponseDto savedBoard = boardService.save(dto);
+        return "redirect:/board/" + savedBoard.getId();
+    }
 
 
     @GetMapping("{id}")
     public ModelAndView detail(@PathVariable("id") Long id, ModelAndView mv) {
 
         try {
-            BoardResponseDto dto = boardService.findBoardById(id).toDto();
+            BoardResponseDto dto = boardService.findBoardById(id);
             mv.addObject("b", dto);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());

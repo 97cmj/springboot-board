@@ -25,17 +25,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <!-- 반복문을 사용하여 게시글 데이터 출력 -->
-                                <tr th:each="b : ${board}">
-                                    <td style="display: none" th:text="${b.id}"></td>
-                                    <td>
-                                        <span th:text="${b.title}"></span>
-                                        (<span style="color: red;" th:text="${b.replyCnt}"></span>)
-                                    </td>
-                                    <td th:text="${b.writer}"></td>
-                                    <td th:text="${b.viewCnt}"></td>
+                                <th:block th:if="${#lists.isEmpty(b)}">
+                                    <tr>
+                                        <td colspan="3">게시글이 없습니다.</td>
+                                    </tr>
+                                </th:block>
 
-                                </tr>
+                                <th:block th:if="${not #lists.isEmpty(b)}">
+                                    <tr th:each="b : ${b}">
+                                        <td style="display: none" th:text="${b.id}"></td>
+                                        <td>
+                                            <span th:text="${b.title}"></span>
+                                            (<span style="color: red;" th:text="${b.replyCnt}"></span>)
+                                        </td>
+                                        <td th:text="${b.writer}"></td>
+                                        <td th:text="${b.viewCnt}"></td>
+                                    </tr>
+                                </th:block>
                                 </tbody>
                             </table>
                         </div>
@@ -51,7 +57,6 @@
                     location.href = "/board/" + id;
                 });
             });
-
         </script>
 
     </main>

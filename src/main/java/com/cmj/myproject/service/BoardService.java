@@ -1,9 +1,15 @@
 package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Board;
+import com.cmj.myproject.dto.BoardRequestDto;
+import com.cmj.myproject.dto.BoardResponseDto;
 import com.cmj.myproject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -11,9 +17,26 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    public Board findBoardById(Long id) {
-        return boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+    public BoardResponseDto findBoardById(Long id) {
+
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+
+        return board.toDto();
     }
 
+    public BoardResponseDto save(BoardRequestDto dto) {
+        try {
+            Board savedBoard = boardRepository.save(dto.toEntity());
+            return savedBoard.toDto();
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("게시글 저장 중에 문제가 발생했습니다.");
+        }
+    }
+
+
+    public List<BoardResponseDto> findAllBoard() {
+
+        return boardRepository.findAll().stream().map(Board::toDto).collect(Collectors.toList());
+
+    }
 }
