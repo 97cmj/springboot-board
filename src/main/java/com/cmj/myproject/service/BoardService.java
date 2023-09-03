@@ -6,6 +6,10 @@ import com.cmj.myproject.dto.BoardResponseDto;
 import com.cmj.myproject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,9 +38,17 @@ public class BoardService {
     }
 
 
-    public List<BoardResponseDto> findAllBoard() {
+    public Page<BoardResponseDto> findAllBoard(Pageable pageable) {
 
-        return boardRepository.findAll().stream().map(Board::toDto).collect(Collectors.toList());
+        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1); // page는 index 처럼 0부터 시작
+        pageable = PageRequest.of(page, 10, Sort.by("id").descending());
+        Page<Board> boardList = boardRepository.findAll(pageable);
 
+        //리퀘스트 페이지넘버가 보드리스트의 페이지넘버보다 크게 들어오면 에러가 발생한다.
+        if(pageable.getPageNumber() > boardList.getTotalPages()) {
+            throw new IllegalArgumentException("해당 페이지가 존재하지 않습니다.");
+        }
+
+        return boardList.map(Board::toDto);
     }
 }

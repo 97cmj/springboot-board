@@ -10,8 +10,8 @@
                 <!-- 게시글 상세 정보를 표시할 카드 -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <a class="btn btn-primary float-end" href="/board/write">
-                            <i class="fas fa-edit"></i> 글 작성
+                        <a class="btn btn-primary float-end" th:href="@{/board(page=${page})}">
+                        <i class="fas fa-edit"></i> 글 목록
                         </a>
                     </div>
 

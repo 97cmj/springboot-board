@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+  <main>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+
+      $(document).ready(function () {
+        search();
+      });
+
+      function search() {
+        const url = /*[[${url}]]*/;
+        const error = /*[[${error}]]*/;
+        alert(error);
+        location.href = url;
+      }
+      /*]]>*/
+    </script>
+  </main>
+</th:block>
+</html>

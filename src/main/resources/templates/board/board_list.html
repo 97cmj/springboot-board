@@ -19,21 +19,22 @@
                             <table class="table table-hover table-striped">
                                 <thead>
                                 <tr>
+                                    <th>번호</th>
                                     <th>제목</th>
                                     <th>작성자</th>
                                     <th>조회수</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <th:block th:if="${#lists.isEmpty(b)}">
-                                    <tr>
+                                <th:block th:if="${boardList.isEmpty()}">
+                                    <tr style="text-align : center">
                                         <td colspan="3">게시글이 없습니다.</td>
                                     </tr>
                                 </th:block>
 
-                                <th:block th:if="${not #lists.isEmpty(b)}">
-                                    <tr th:each="b : ${b}">
-                                        <td style="display: none" th:text="${b.id}"></td>
+                                <th:block th:if="${!boardList.isEmpty()}">
+                                    <tr th:each="b : ${boardList}">
+                                        <td th:text="${b.id}"></td>
                                         <td>
                                             <span th:text="${b.title}"></span>
                                             (<span style="color: red;" th:text="${b.replyCnt}"></span>)
@@ -46,15 +47,53 @@
                             </table>
                         </div>
                     </div>
+
+                    <nav style="text-align: center;">
+                        <ul class="pagination justify-content-center"
+                            th:with="start=${T(java.lang.Math).floor(boardList.number/10)*10 + 1},
+        last=(${start + 9 < boardList.totalPages ? start + 9 : boardList.totalPages})">
+
+                            <li class="page-item" th:class="${boardList.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/board(page=1)}" aria-label="First">
+                                    <span aria-hidden="true">&lt;&lt;</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:class="${boardList.first} ? 'disabled'">
+                                <a class="page-link" th:href="${boardList.first} ? '#' :@{/board(page=${boardList.number})}" aria-label="Previous">
+                                    <span aria-hidden="true">&lt;</span>
+                                </a>
+                            </li>
+
+                            <li th:each="page: ${#numbers.sequence(start, last)}" th:class="${page == boardList.number + 1} ? 'active page-item' : 'page-item'">
+                                <a class="page-link" th:text="${page}" th:href="@{/board(page=${page})}"></a>
+                            </li>
+
+                            <li class="page-item" th:class="${boardList.last} ? 'disabled'">
+                                <a class="page-link" th:href="${boardList.last} ? '#' : @{/board(page=${boardList.number + 2})}" aria-label="Next">
+                                    <span aria-hidden="true">&gt;</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:class="${boardList.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/board(page=${boardList.totalPages})}" aria-label="Last">
+                                    <span aria-hidden="true">&gt;&gt;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
 
-        <script>
+        <script  th:inline="javascript">
+            /*<![CDATA[*/
             $(document).ready(function () {
                 $("tr").click(function () {
+
                     var id = $(this).find("td:eq(0)").text();
-                    location.href = "/board/" + id;
+                    const page = /*[[${boardList.getNumber+1}]]*/;
+                    location.href = "/board/" + id + "?page=" + page;
                 });
             });
         </script>
