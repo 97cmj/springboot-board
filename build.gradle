@@ -33,6 +33,7 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
     implementation('nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect')
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 
     compileOnly 'org.projectlombok:lombok'

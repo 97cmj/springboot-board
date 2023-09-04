@@ -9,10 +9,22 @@
 
                 <!-- 게시글 상세 정보를 표시할 카드 -->
                 <div class="card mb-4">
+
+
                     <div class="card-header">
+
                         <a class="btn btn-primary float-end" th:href="@{/board(page=${page})}">
                         <i class="fas fa-edit"></i> 글 목록
                         </a>
+
+                        <a class="btn btn-primary float-end" style="margin-right : 10px;"  onclick="deleteConfirm()">
+                            <i class="fas fa-edit"></i> 글 삭제
+                        </a>
+
+                        <a class="btn btn-primary float-end" style="margin-right : 10px;" th:href="@{/board/{id}/update(id=${b.getId})}">
+                            <i class="fas fa-edit"></i> 글 수정
+                        </a>
+
                     </div>
 
                     <div class="card-body">
@@ -40,14 +52,46 @@
                         <form th:action="@{/board/comment}" method="post">
                             <input type="hidden" name="boardId">
                             <div class="form-group">
-                                <textarea class="form-control" name="content" placeholder="댓글 작성" required></textarea>
+                                <textarea class="form-control" name="content" placeholder="댓글을 입력하세요." required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary">댓글 작성</button>
+                            <button type="submit" style="margin-top : 10px;" class="btn btn-primary">댓글 작성</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <script th:inline="javascript">
+        //삭제하시겠습니까?
+        function deleteConfirm() {
+            if (confirm("삭제하시겠습니까?") == true) {
+                deleteAjax();
+            } else {
+                return false;
+            }
+        }
+
+        function deleteAjax() {
+            /*<![CDATA[*/
+            const boardId = /*[[${b.getId}]]*/;
+            $.ajax({
+                type: "DELETE",
+                url: `/board/${boardId}/delete`,
+                success: function (response) {
+                    console.log(response);
+                    // 서버에서 HttpStatus.OK를 반환하면 성공으로 간주
+                    alert("삭제가 완료되었습니다.");
+                    window.location.href = "/board";
+                },
+                error: function (xhr, status, error) {
+                    // 에러 처리
+                    alert("삭제에 실패하였습니다. 에러 상태: " + xhr.status);
+                }
+            });
+        }
+    </script>
+    </body>
+
 </th:block>
 </html>

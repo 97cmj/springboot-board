@@ -1,5 +1,6 @@
 package com.cmj.myproject.domain;
 
+import com.cmj.myproject.dto.BoardRequestDto;
 import com.cmj.myproject.dto.BoardResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +49,12 @@ public class Board extends BaseEntity {
                 .recommendCnt(recommendCnt)
                 .replyCnt(replyCnt)
                 .build();
+    }
+
+    public Board update(BoardRequestDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        return this;
     }
 
 
