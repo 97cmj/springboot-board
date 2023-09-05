@@ -19,10 +19,7 @@ public class Interceptor implements HandlerInterceptor {
 
         String username = authentication.getName();
 
-
         if(!Objects.equals(username, "anonymousUser")) {
-
-
             if(request.getRequestURI().contains("/login") || request.getRequestURI().contains("/signup")) {
                 response.sendRedirect("/");
                 return false;

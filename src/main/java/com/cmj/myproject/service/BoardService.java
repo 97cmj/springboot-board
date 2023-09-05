@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,6 +28,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     private final RedisUtil redisUtil;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
     public BoardResponseDto findBoardById(Long id, String memberId) {
@@ -57,6 +61,7 @@ public class BoardService {
 
     public BoardResponseDto save(BoardRequestDto dto) {
         try {
+
             Board savedBoard = boardRepository.save(dto.toEntity());
             return savedBoard.toDto();
         } catch (DataIntegrityViolationException e) {
@@ -103,4 +108,12 @@ public class BoardService {
     }
 
 
+    public void boardPassCheck(Long id, String password) {
+
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+        if(!passwordEncoder.matches(password, board.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+    }
 }

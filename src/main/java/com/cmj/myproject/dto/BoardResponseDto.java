@@ -19,6 +19,7 @@ public class BoardResponseDto {
     private Long id;
     private String title;
     private String content;
+    private String password;
     private String writer;
     private int viewCnt;
     private int recommendCnt;

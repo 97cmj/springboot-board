@@ -2,14 +2,12 @@ package com.cmj.myproject.domain;
 
 import com.cmj.myproject.dto.BoardRequestDto;
 import com.cmj.myproject.dto.BoardResponseDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,6 +24,9 @@ public class Board extends BaseEntity {
 
     @Column(name = "content", nullable = false)
     private String content;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Column(name = "writer", nullable = false)
     private String writer;
@@ -54,6 +55,7 @@ public class Board extends BaseEntity {
     public Board update(BoardRequestDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
+        this.password = dto.getPassword();
         return this;
     }
 

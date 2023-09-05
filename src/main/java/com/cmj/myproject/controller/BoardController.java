@@ -13,6 +13,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,6 +30,8 @@ public class BoardController {
     private final BoardService boardService;
 
     private final HttpSession session;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping("")
     public ModelAndView board(ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
@@ -57,6 +61,7 @@ public class BoardController {
     @PostMapping("/write")
     public ModelAndView write(BoardRequestDto dto, ModelAndView mv) {
 
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         BoardResponseDto savedBoard = boardService.save(dto);
         mv.setViewName("redirect:/board/");
 
@@ -80,10 +85,25 @@ public class BoardController {
         return mv;
     }
 
+    @PostMapping("{id}/boardPassCheck")
+    @ResponseBody
+    public ResponseEntity boardPassCheck(@PathVariable("id") Long id, @RequestParam String password) {
+
+        try {
+            boardService.boardPassCheck(id, password);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("{id}/update")
     public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv) {
         try {
             BoardResponseDto dto = boardService.findBoardById(id, session.getId());
+
             mv.addObject("b", dto);
             mv.setViewName("board/board_update");
         } catch (IllegalArgumentException e) {
@@ -106,6 +126,7 @@ public class BoardController {
     }
 
     @DeleteMapping("{id}/delete")
+    @ResponseBody
     public ResponseEntity delete(@PathVariable("id") Long id) {
         try {
             boardService.delete(id);

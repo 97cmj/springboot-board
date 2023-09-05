@@ -21,9 +21,11 @@
                             <i class="fas fa-edit"></i> 글 삭제
                         </a>
 
-                        <a class="btn btn-primary float-end" style="margin-right : 10px;" th:href="@{/board/{id}/update(id=${b.getId})}">
+                        <a class="btn btn-primary float-end" style="margin-right : 10px;" onclick="updateConfirm()">
                             <i class="fas fa-edit"></i> 글 수정
                         </a>
+
+                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요.">
 
                     </div>
 
@@ -65,10 +67,12 @@
     <script th:inline="javascript">
         //삭제하시겠습니까?
         function deleteConfirm() {
-            if (confirm("삭제하시겠습니까?") == true) {
-                deleteAjax();
-            } else {
+            if ($("#password").val() == "") {
+                alert("비밀번호를 입력해주세요.");
+                $("#password").focus();
                 return false;
+            } else {
+                deleteCheckAjax();
             }
         }
 
@@ -90,6 +94,57 @@
                 }
             });
         }
+
+        //비밀번호 확인
+        function updateConfirm() {
+            //패스워드가 비어져있다면
+            if ($("#password").val() == "") {
+                alert("비밀번호를 입력해주세요.");
+                $("#password").focus();
+                return false;
+            } else {
+                updateAjax();
+            }
+        }
+
+        function updateAjax() {
+            /*<![CDATA[*/
+            const boardId = /*[[${b.getId}]]*/;
+            const password = $("#password").val();
+            $.ajax({
+                type: "POST",
+                url: `/board/${boardId}/boardPassCheck`,
+                data: {password: password},
+                success: function (response) {
+                    window.location.href = `/board/${boardId}/update`;
+                },
+                error: function (xhr, status, error) {
+                    // 에러 처리
+                    alert("비밀번호가 틀렸습니다. 에러 상태: " + xhr.status);
+                }
+            });
+        }
+
+        function deleteCheckAjax() {
+            /*<![CDATA[*/
+            const boardId = /*[[${b.getId}]]*/;
+            const password = $("#password").val();
+            $.ajax({
+                type: "POST",
+                url: `/board/${boardId}/boardPassCheck`,
+                data: {password: password},
+                success: function (response) {
+                    deleteAjax();
+                },
+                error: function (xhr, status, error) {
+                    // 에러 처리
+                    alert("비밀번호가 틀렸습니다. 에러 상태: " + xhr.status);
+                }
+            });
+        }
+
+
+
     </script>
     </body>
 

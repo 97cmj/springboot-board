@@ -15,13 +15,18 @@ public class BoardRequestDto {
     private String title;
     private String content;
     private String writer;
+    private String password;
 
     public Board toEntity() {
+
         return Board.builder()
                 .title(title)
                 .content(content)
                 .writer(writer)
+                .password(password)
                 .build();
     }
+
+
 
 }
