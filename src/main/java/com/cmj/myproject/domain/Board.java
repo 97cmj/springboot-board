@@ -31,6 +31,9 @@ public class Board extends BaseEntity {
     @Column(name = "writer", nullable = false)
     private String writer;
 
+    @Column(name = "writer_id", nullable = false)
+    private String writerId;
+
     @Column(name = "view_cnt", nullable = false)
     private int viewCnt;
 
@@ -46,6 +49,7 @@ public class Board extends BaseEntity {
                 .title(title)
                 .content(content)
                 .writer(writer)
+                .writerId(writerId)
                 .viewCnt(viewCnt)
                 .recommendCnt(recommendCnt)
                 .replyCnt(replyCnt)

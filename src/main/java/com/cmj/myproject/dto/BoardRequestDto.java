@@ -15,6 +15,7 @@ public class BoardRequestDto {
     private String title;
     private String content;
     private String writer;
+    private String writerId;
     private String password;
 
     public Board toEntity() {
@@ -23,6 +24,7 @@ public class BoardRequestDto {
                 .title(title)
                 .content(content)
                 .writer(writer)
+                .writerId(writerId)
                 .password(password)
                 .build();
     }

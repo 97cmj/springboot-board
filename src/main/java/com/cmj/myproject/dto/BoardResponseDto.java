@@ -21,6 +21,7 @@ public class BoardResponseDto {
     private String content;
     private String password;
     private String writer;
+    private String writerId;
     private int viewCnt;
     private int recommendCnt;
     private int replyCnt;
@@ -34,6 +35,7 @@ public class BoardResponseDto {
                 .title(title)
                 .content(content)
                 .writer(writer)
+                .writerId(writerId)
                 .viewCnt(viewCnt)
                 .recommendCnt(recommendCnt)
                 .replyCnt(replyCnt)

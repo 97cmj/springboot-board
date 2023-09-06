@@ -1,9 +1,8 @@
 package com.cmj.myproject.controller;
 
-import com.cmj.myproject.config.security.MemberAdapter;
-import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.dto.BoardRequestDto;
 import com.cmj.myproject.dto.BoardResponseDto;
+import com.cmj.myproject.dto.MemberResponseDto;
 import com.cmj.myproject.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,8 +47,13 @@ public class BoardController {
     }
 
     @GetMapping("/write")
-    public ModelAndView write(@AuthenticationPrincipal MemberAdapter memberAdapter, ModelAndView mv) {
-        Member m = (memberAdapter != null) ? memberAdapter.getMember() : MemberAdapter.createAnonymousMember();
+    public ModelAndView write(ModelAndView mv) {
+
+        MemberResponseDto m = (MemberResponseDto) session.getAttribute("m");
+
+        if(m == null) {
+            setErrorModelAndView(mv, new IllegalArgumentException("로그인 후 작성할 수 있습니다."));
+        }
 
         mv.addObject("m", m);
 
@@ -61,9 +64,13 @@ public class BoardController {
     @PostMapping("/write")
     public ModelAndView write(BoardRequestDto dto, ModelAndView mv) {
 
-        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        BoardResponseDto savedBoard = boardService.save(dto);
-        mv.setViewName("redirect:/board/");
+        try {
+            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+            boardService.save(dto);
+            mv.setViewName("redirect:/board/");
+        } catch (IllegalArgumentException e) {
+            setErrorModelAndView(mv, e);
+        }
 
         return mv;
     }
@@ -85,25 +92,10 @@ public class BoardController {
         return mv;
     }
 
-    @PostMapping("{id}/boardPassCheck")
-    @ResponseBody
-    public ResponseEntity boardPassCheck(@PathVariable("id") Long id, @RequestParam String password) {
-
-        try {
-            boardService.boardPassCheck(id, password);
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("{id}/update")
     public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv) {
         try {
             BoardResponseDto dto = boardService.findBoardById(id, session.getId());
-
             mv.addObject("b", dto);
             mv.setViewName("board/board_update");
         } catch (IllegalArgumentException e) {

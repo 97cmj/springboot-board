@@ -1,6 +1,7 @@
 package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Member;
+import com.cmj.myproject.domain.Role;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.exception.DuplicateEmailException;
 import com.cmj.myproject.repository.MemberRepository;
@@ -37,6 +38,7 @@ public class MemberService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .name(dto.getName())
+                .role(Role.valueOf(Role.MEMBER.getKey()))
                 .build();
 
         memberRepository.save(member);

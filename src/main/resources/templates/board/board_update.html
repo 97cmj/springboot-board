@@ -25,15 +25,6 @@
                                            th:value="${b.getWriter}">
                                 </div>
 
-                                <th:block th:if="${session.m == null}">
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label">비밀번호</label>
-                                        <input type="password" class="form-control" id="password" name="password"
-                                               placeholder="비밀번호를 입력하세요.">
-                                    </div>
-                                </th:block>
-
-
                                 <button type="button" class="btn btn-outline-secondary" onclick="goBack()">뒤로</button>
                                 <button class="btn btn-outline-primary">글 수정</button>
                             </form>

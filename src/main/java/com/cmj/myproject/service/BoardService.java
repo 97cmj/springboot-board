@@ -11,13 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.cmj.myproject.util.RedisUtil.calculateTimeUntilMidnight;
 
@@ -29,7 +27,7 @@ public class BoardService {
 
     private final RedisUtil redisUtil;
 
-    private final BCryptPasswordEncoder passwordEncoder;
+
 
     @Transactional
     public BoardResponseDto findBoardById(Long id, String memberId) {
@@ -57,11 +55,10 @@ public class BoardService {
     }
 
 
-
-
     public BoardResponseDto save(BoardRequestDto dto) {
         try {
 
+            checkIfUserIsAuthor(dto.toEntity(), "글을 작성");
             Board savedBoard = boardRepository.save(dto.toEntity());
             return savedBoard.toDto();
         } catch (DataIntegrityViolationException e) {
@@ -88,7 +85,10 @@ public class BoardService {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
         try {
+
+            checkIfUserIsAuthor(board, "수정");
             boardRepository.save(board.update(dto));
+
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("게시글 수정 중에 문제가 발생했습니다.");
         }
@@ -101,19 +101,23 @@ public class BoardService {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
         try {
-             boardRepository.delete(board);
+
+            checkIfUserIsAuthor(board, "삭제");
+            boardRepository.delete(board);
+
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("게시글 삭제 중에 문제가 발생했습니다.");
         }
     }
 
+    private void checkIfUserIsAuthor(Board board, String category) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
 
-    public void boardPassCheck(Long id, String password) {
-
-        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
-        if(!passwordEncoder.matches(password, board.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
+            if ("anonymousUser".equals(email) && !email.equals(board.getWriterId())) {
+                throw new IllegalArgumentException("작성자만 + " + category + "할 수 있습니다.");
+            }
     }
+
+
 }

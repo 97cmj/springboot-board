@@ -1,6 +1,7 @@
 package com.cmj.myproject.config.security;
 
 import com.cmj.myproject.domain.Member;
+import com.cmj.myproject.dto.MemberResponseDto;
 import com.cmj.myproject.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,21 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        log.info(memberRepository.findByEmail(email).toString());
+        if(email == null || email.equals("")){
+            throw new UsernameNotFoundException("아이디를 입력해주세요.");
+        }
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
 
-        return new MemberAdapter(member);
+        return Member.builder()
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .name(member.getName())
+                .role(member.getRole())
+                .build();
     }
+
+
+
 }
