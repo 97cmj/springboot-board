@@ -48,9 +48,8 @@ public class BoardController {
     }
 
     @GetMapping("/write")
-    public ModelAndView write(ModelAndView mv, @AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView write(ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        log.info("userDetails: {}", userDetails);
 
         if (userDetails == null) {
             setErrorModelAndView(mv, new IllegalArgumentException("로그인이 필요합니다."));
@@ -98,11 +97,20 @@ public class BoardController {
     }
 
     @GetMapping("{id}/update")
-    public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv) {
+    public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             BoardResponseDto dto = boardService.findBoardById(id, session.getId());
-            mv.addObject("b", dto);
-            mv.setViewName("board/board_update");
+
+            if(userDetails == null){
+                throw new IllegalArgumentException("로그인이 필요합니다.");
+            }
+            if(!dto.getWriterId().equals(userDetails.getUsername())){
+                throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+            } else {
+                mv.addObject("b", dto);
+                mv.setViewName("board/board_update");
+            }
+
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
         }

@@ -20,10 +20,6 @@ public class Interceptor implements HandlerInterceptor {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-
-        log.info("principal : {}", principal);
-
 
 
         if (!Objects.equals(username, "anonymousUser")) {

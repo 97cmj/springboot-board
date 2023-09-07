@@ -19,7 +19,6 @@ public class BoardResponseDto {
     private Long id;
     private String title;
     private String content;
-    private String password;
     private String writer;
     private String writerId;
     private int viewCnt;

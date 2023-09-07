@@ -21,11 +21,13 @@ import javax.servlet.http.HttpSession;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final CustomUserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
 
@@ -35,7 +37,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
 
 
         if (passwordEncoder.matches(password, userDetails.getPassword())) {

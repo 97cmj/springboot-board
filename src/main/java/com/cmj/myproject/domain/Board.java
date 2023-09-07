@@ -25,9 +25,6 @@ public class Board extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "writer", nullable = false)
     private String writer;
 
@@ -59,7 +56,6 @@ public class Board extends BaseEntity {
     public Board update(BoardRequestDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
-        this.password = dto.getPassword();
         return this;
     }
 
