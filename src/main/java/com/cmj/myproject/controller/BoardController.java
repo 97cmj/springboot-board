@@ -1,5 +1,6 @@
 package com.cmj.myproject.controller;
 
+import com.cmj.myproject.config.security.CustomUserDetails;
 import com.cmj.myproject.dto.BoardRequestDto;
 import com.cmj.myproject.dto.BoardResponseDto;
 import com.cmj.myproject.dto.MemberResponseDto;
@@ -12,12 +13,14 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @Controller
@@ -28,8 +31,6 @@ public class BoardController {
     private final BoardService boardService;
 
     private final HttpSession session;
-
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping("")
     public ModelAndView board(ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
@@ -47,17 +48,22 @@ public class BoardController {
     }
 
     @GetMapping("/write")
-    public ModelAndView write(ModelAndView mv) {
+    public ModelAndView write(ModelAndView mv, @AuthenticationPrincipal UserDetails userDetails) {
 
-        MemberResponseDto m = (MemberResponseDto) session.getAttribute("m");
+        log.info("userDetails: {}", userDetails);
 
-        if(m == null) {
-            setErrorModelAndView(mv, new IllegalArgumentException("로그인 후 작성할 수 있습니다."));
+        if (userDetails == null) {
+            setErrorModelAndView(mv, new IllegalArgumentException("로그인이 필요합니다."));
+            return mv;
         }
 
-        mv.addObject("m", m);
+        try{
+            mv.setViewName("board/board_write");
+            mv.addObject("m", userDetails);
 
-        mv.setViewName("board/board_write");
+        } catch (IllegalArgumentException e) {
+            setErrorModelAndView(mv, e);
+        }
         return mv;
     }
 
@@ -65,7 +71,6 @@ public class BoardController {
     public ModelAndView write(BoardRequestDto dto, ModelAndView mv) {
 
         try {
-            dto.setPassword(passwordEncoder.encode(dto.getPassword()));
             boardService.save(dto);
             mv.setViewName("redirect:/board/");
         } catch (IllegalArgumentException e) {

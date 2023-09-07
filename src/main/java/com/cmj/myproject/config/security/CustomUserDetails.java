@@ -1,5 +1,6 @@
 package com.cmj.myproject.config.security;
 
+import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +43,13 @@ public class CustomUserDetails implements UserDetails {
 
     }
 
+    public CustomUserDetails(Member member) {
+        this.email = member.getEmail();
+        this.password = member.getPassword();
+        this.name = member.getName();
+        this.role = member.getRole();
+    }
+
 
     // 사용자의 id를 반환 (unique한 값)
     @Override
@@ -82,4 +90,6 @@ public class CustomUserDetails implements UserDetails {
         // 계정이 사용 가능한지 확인하는 로직
         return true; // true -> 사용 가능
     }
+
+
 }

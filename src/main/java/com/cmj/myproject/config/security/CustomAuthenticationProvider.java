@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +24,8 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
+    private final BCryptPasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
 
 
 
@@ -35,17 +36,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        Member member = null;
-
-        if (userDetails instanceof Member) {
-            member = (Member) userDetails;
-            // 이제 Member 객체로 작업할 수 있습니다.
-        }
 
 
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
 
-            return new UsernamePasswordAuthenticationToken(member, null, userDetails.getAuthorities());
+            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
         } else {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");

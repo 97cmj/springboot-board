@@ -9,18 +9,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationProvider customAuthenticationProvider;
-
-    @Autowired
-    public SecurityConfig(@Lazy CustomAuthenticationProvider customAuthenticationProvider) {
-        this.customAuthenticationProvider = customAuthenticationProvider;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -44,7 +41,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public CustomUserDetailsService customUserDetailsService() {
+        return new CustomUserDetailsService();
+    }
+
+
+    @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-}
+
+
+    }

@@ -1,5 +1,6 @@
 package com.cmj.myproject.domain;
 
+import com.cmj.myproject.config.security.CustomUserDetails;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,4 +33,15 @@ public class Member extends BaseEntity {
 
     @Column
     private Role role;
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        authorities.add(new SimpleGrantedAuthority(role.getKey()));
+
+        return authorities;
+
+    }
+
 }
