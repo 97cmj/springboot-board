@@ -5,6 +5,8 @@ import com.cmj.myproject.dto.BoardResponseDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,6 +41,10 @@ public class Board extends BaseEntity {
 
     @Column(name = "reply_cnt", nullable = false)
     private int replyCnt;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
 
     public BoardResponseDto toDto() {
         return BoardResponseDto.builder()

@@ -82,12 +82,14 @@ public class BoardController {
 
     @GetMapping("{id}")
     public ModelAndView detail(@PathVariable("id") Long id,
-                               @RequestParam(defaultValue = "1") int page, ModelAndView mv) {
+                               @RequestParam(defaultValue = "1") int page, ModelAndView mv,
+                               @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
             BoardResponseDto dto = boardService.findBoardById(id, session.getId());
             mv.addObject("b", dto);
             mv.addObject("page", page);
+            mv.addObject("m", userDetails);
             mv.setViewName("board/board_detail");
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
@@ -149,6 +151,21 @@ public class BoardController {
         mv.addObject("error", e.getMessage());
         mv.addObject("url", "/board");
         mv.setViewName("error/error");
+    }
+
+    //댓글 리스트 조회
+    @GetMapping("{id}/comment")
+    @ResponseBody
+    public ResponseEntity comment(@PathVariable("id") Long id, @PageableDefault(size = 10, page = 1) Pageable pageable) {
+
+        try {
+            Page<BoardResponseDto> replyList = boardService.findCommentList(id, pageable);
+            return new ResponseEntity(replyList, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

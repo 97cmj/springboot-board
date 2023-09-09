@@ -1,6 +1,8 @@
 package com.cmj.myproject.repository;
 
 import com.cmj.myproject.domain.Board;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +17,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Modifying
     @Query("UPDATE Board b SET b.viewCnt = b.viewCnt + 1 WHERE b.id = :id")
     int updateViewCnt(@Param("id") Long id);
+
 }
