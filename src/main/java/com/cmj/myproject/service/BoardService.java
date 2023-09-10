@@ -1,11 +1,14 @@
 package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Board;
-import com.cmj.myproject.dto.BoardRequestDto;
-import com.cmj.myproject.dto.BoardResponseDto;
+import com.cmj.myproject.domain.Comment;
+import com.cmj.myproject.dto.BoardDto;
+import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.repository.BoardRepository;
+import com.cmj.myproject.repository.CommentRepository;
 import com.cmj.myproject.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,16 +24,17 @@ import static com.cmj.myproject.util.RedisUtil.calculateTimeUntilMidnight;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     private final RedisUtil redisUtil;
 
 
-
     @Transactional
-    public BoardResponseDto findBoardById(Long id, String memberId) {
+    public BoardDto findBoardById(Long id, String memberId) {
         // Redis에서 해당 게시물의 조회 여부 확인
         String viewCountKey = String.valueOf(id);
         String viewCount = redisUtil.getData(viewCountKey);
@@ -55,7 +59,7 @@ public class BoardService {
     }
 
 
-    public BoardResponseDto save(BoardRequestDto dto) {
+    public BoardDto save(BoardDto dto) {
         try {
 
             checkIfUserIsAuthor(dto.toEntity(), "글을 작성");
@@ -67,7 +71,7 @@ public class BoardService {
     }
 
 
-    public Page<BoardResponseDto> findAllBoard(Pageable pageable) {
+    public Page<BoardDto> findAllBoard(Pageable pageable) {
 
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1); // page는 index 처럼 0부터 시작
         pageable = PageRequest.of(page, 10, Sort.by("id").descending());
@@ -81,7 +85,7 @@ public class BoardService {
         return boardList.map(Board::toDto);
     }
 
-    public BoardResponseDto update(Long id, BoardRequestDto dto) {
+    public BoardDto update(Long id, BoardDto dto) {
 
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
         try {
@@ -114,24 +118,44 @@ public class BoardService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-            if ("anonymousUser".equals(email) && !email.equals(board.getWriterId())) {
-                throw new IllegalArgumentException("작성자만 + " + category + "할 수 있습니다.");
-            }
+        if ("anonymousUser".equals(email) && !email.equals(board.getWriterId())) {
+            throw new IllegalArgumentException("작성자만 + " + category + "할 수 있습니다.");
+        }
     }
 
 
-    public Page<BoardResponseDto> findCommentList(Long id, Pageable pageable) {
+    public Page<CommentDto> findCommentList(Long id, Pageable pageable) {
 
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1); // page는 index 처럼 0부터 시작
-        pageable = PageRequest.of(page, 10, Sort.by("id").descending());
-        Page<Board> boardList = boardRepository.findAll(pageable);
+        pageable = PageRequest.of(page, 5, Sort.by("id").descending());
 
-        //리퀘스트 페이지넘버가 보드리스트의 페이지넘버보다 크게 들어오면 에러가 발생한다.
-        if (pageable.getPageNumber() > boardList.getTotalPages()) {
-            throw new IllegalArgumentException("해당 페이지가 존재하지 않습니다.");
+        Page<Comment> commentPage = commentRepository.findCommentsByBoardId(id, pageable);
+
+        if(!commentPage.getContent().isEmpty()){
+            // 페이지 번호가 존재하지 않으면 예외 처리
+            if (pageable.getPageNumber() >= commentPage.getTotalPages()) {
+                throw new IllegalArgumentException("해당 페이지가 존재하지 않습니다.");
+            }
         }
 
-        return boardList.map(Board::toDto);
+        return commentPage.map(Comment::toDto);
+
+    }
+
+    public void saveComment(Long id, CommentDto dto) {
+
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+        try {
+
+            checkIfUserIsAuthor(board, "댓글 작성");
+            Comment comment = dto.toEntity();
+            comment.setBoard(board);
+
+            commentRepository.save(comment);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("댓글 저장 중에 문제가 발생했습니다.");
+        }
 
     }
 }

@@ -14,16 +14,17 @@
                     <div class="card-header">
 
                         <a class="btn btn-primary float-end" th:href="@{/board(page=${page})}">
-                        <i class="fas fa-edit"></i> 글 목록
+                            <i class="fas fa-edit"></i> 글 목록
                         </a>
 
                         <th:block th:if="${m.getEmail().equals(b.getWriterId())}">
                             <a class="btn btn-primary float-end" style="margin-right : 10px;" onclick="deleteBoard()">
 
-                            <i class="fas fa-edit"></i> 글 삭제
+                                <i class="fas fa-edit"></i> 글 삭제
                             </a>
 
-                            <a class="btn btn-primary float-end" style="margin-right : 10px;" th:href="@{/board/{id}/update(id=${b.getId})}">
+                            <a class="btn btn-primary float-end" style="margin-right : 10px;"
+                               th:href="@{/board/{id}/update(id=${b.getId})}">
                                 <i class="fas fa-edit"></i> 글 수정
                             </a>
 
@@ -47,17 +48,31 @@
                     </div>
                     <div class="card-body">
                         <!-- 댓글 리스트를 표시하는 부분 -->
-                        <ul class="list-group">
-                            <!--                            <li th:each="comment : ${board.comments}" class="list-group-item">-->
-                            <!--                                <p th:text="${comment.content}"></p>-->
-                            <!--                            </li>-->
-                        </ul>
+                        <div id="comment-container">
+                            <th:block th:if="${commentList.size != 0}"  th:each="c : ${commentList}">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <p>내용</p>
+                                        <p><span th:text="${c.content}"></span></p>
+                                        <p>작성자 ) <span th:text="${c.writer}"></span></p>
+                                    </div>
+                                </div>
+                            </th:block>
 
+                            <th:block th:if="${commentList.size == 0}">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <p>댓글이 없습니다.</p>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div> <!-- 댓글을 표시할 컨테이너 -->
                         <!-- 댓글 작성 폼 -->
-                        <form th:action="@{/board/comment}" method="post">
-                            <input type="hidden" name="boardId">
+                        <form id="commentForm" method="post" onsubmit="submitComment(event)">
                             <div class="form-group">
                                 <textarea class="form-control" name="content" placeholder="댓글을 입력하세요." required></textarea>
+                                <input type="hidden" name="writer" th:value="${m.getName()}">
+                                <input type="hidden" name="writerId" th:value="${m.getEmail()}">
                             </div>
                             <button type="submit" style="margin-top : 10px;" class="btn btn-primary">댓글 작성</button>
                         </form>
@@ -90,6 +105,30 @@
                     });
             }
         }
+
+        function submitComment(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(document.getElementById('commentForm'));
+            const boardId = /*[[${b.id}]]*/;
+
+            fetch(`/board/${boardId}/comment`, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Comment was added successfully, so redirect to the current board page
+                        window.location.href = '/board/' +  boardId + '?page=' + /*[[${page}]]*/;
+                    } else {
+                        console.error("Failed to add a comment");
+                    }
+                })
+                .catch(error => {
+                    console.error("Request error:", error);
+                });
+        }
+
     </script>
 
 

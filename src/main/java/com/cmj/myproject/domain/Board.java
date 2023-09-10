@@ -1,7 +1,6 @@
 package com.cmj.myproject.domain;
 
-import com.cmj.myproject.dto.BoardRequestDto;
-import com.cmj.myproject.dto.BoardResponseDto;
+import com.cmj.myproject.dto.BoardDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,7 +17,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
+    @Column(name = "board_id", updatable = false)
     private Long id;
 
     @Column(name = "title", nullable = false)
@@ -39,15 +38,12 @@ public class Board extends BaseEntity {
     @Column(name = "recommend_cnt", nullable = false)
     private int recommendCnt;
 
-    @Column(name = "reply_cnt", nullable = false)
-    private int replyCnt;
-
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
 
-    public BoardResponseDto toDto() {
-        return BoardResponseDto.builder()
+    public BoardDto toDto() {
+        return BoardDto.builder()
                 .id(id)
                 .title(title)
                 .content(content)
@@ -55,11 +51,10 @@ public class Board extends BaseEntity {
                 .writerId(writerId)
                 .viewCnt(viewCnt)
                 .recommendCnt(recommendCnt)
-                .replyCnt(replyCnt)
                 .build();
     }
 
-    public Board update(BoardRequestDto dto) {
+    public Board update(BoardDto dto) {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         return this;

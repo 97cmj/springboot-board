@@ -1,9 +1,8 @@
 package com.cmj.myproject.controller;
 
 import com.cmj.myproject.config.security.CustomUserDetails;
-import com.cmj.myproject.dto.BoardRequestDto;
-import com.cmj.myproject.dto.BoardResponseDto;
-import com.cmj.myproject.dto.MemberResponseDto;
+import com.cmj.myproject.dto.BoardDto;
+import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +12,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @Controller
@@ -36,7 +32,7 @@ public class BoardController {
     public ModelAndView board(ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
 
         try {
-            Page<BoardResponseDto> b = boardService.findAllBoard(pageable);
+            Page<BoardDto> b = boardService.findAllBoard(pageable);
             mv.addObject("boardList", b);
             mv.setViewName("board/board_list");
 
@@ -67,7 +63,7 @@ public class BoardController {
     }
 
     @PostMapping("/write")
-    public ModelAndView write(BoardRequestDto dto, ModelAndView mv) {
+    public ModelAndView write(BoardDto dto, ModelAndView mv) {
 
         try {
             boardService.save(dto);
@@ -83,14 +79,19 @@ public class BoardController {
     @GetMapping("{id}")
     public ModelAndView detail(@PathVariable("id") Long id,
                                @RequestParam(defaultValue = "1") int page, ModelAndView mv,
-                               @AuthenticationPrincipal CustomUserDetails userDetails) {
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               @PageableDefault(size = 5, page = 1) Pageable pageable) {
 
         try {
-            BoardResponseDto dto = boardService.findBoardById(id, session.getId());
+            BoardDto dto = boardService.findBoardById(id, session.getId());
             mv.addObject("b", dto);
             mv.addObject("page", page);
             mv.addObject("m", userDetails);
             mv.setViewName("board/board_detail");
+
+            Page<CommentDto> commentList = boardService.findCommentList(id, pageable);
+            mv.addObject("commentList", commentList);
+
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
         }
@@ -101,7 +102,7 @@ public class BoardController {
     @GetMapping("{id}/update")
     public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            BoardResponseDto dto = boardService.findBoardById(id, session.getId());
+            BoardDto dto = boardService.findBoardById(id, session.getId());
 
             if(userDetails == null){
                 throw new IllegalArgumentException("로그인이 필요합니다.");
@@ -121,9 +122,9 @@ public class BoardController {
     }
 
     @PostMapping("{id}/update")
-    public ModelAndView update(@PathVariable("id") Long id, BoardRequestDto dto, ModelAndView mv) {
+    public ModelAndView update(@PathVariable("id") Long id, BoardDto dto, ModelAndView mv) {
         try {
-            BoardResponseDto updatedBoard = boardService.update(id, dto);
+            BoardDto updatedBoard = boardService.update(id, dto);
             mv.setViewName("redirect:/board/" + updatedBoard.getId());
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
@@ -153,20 +154,22 @@ public class BoardController {
         mv.setViewName("error/error");
     }
 
-    //댓글 리스트 조회
-    @GetMapping("{id}/comment")
+
+    //댓글 작성
+    @PostMapping("{id}/comment")
     @ResponseBody
-    public ResponseEntity comment(@PathVariable("id") Long id, @PageableDefault(size = 10, page = 1) Pageable pageable) {
+    public ResponseEntity comment(@PathVariable("id") Long id, CommentDto dto) {
 
         try {
-            Page<BoardResponseDto> replyList = boardService.findCommentList(id, pageable);
-            return new ResponseEntity(replyList, HttpStatus.OK);
+            boardService.saveComment(id, dto);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 }

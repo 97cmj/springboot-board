@@ -1,32 +1,35 @@
 package com.cmj.myproject.dto;
 
 import com.cmj.myproject.domain.Board;
+import com.cmj.myproject.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
 @Builder
-public class BoardRequestDto {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommentDto {
 
-    private String title;
-    private String content;
+    private Long id;
+
     private String writer;
+
     private String writerId;
 
-    public Board toEntity() {
+    private String content;
 
-        return Board.builder()
-                .title(title)
-                .content(content)
+    private int recommendCnt;
+
+    public Comment toEntity() {
+        return Comment.builder()
                 .writer(writer)
                 .writerId(writerId)
+                .content(content)
+                .recommendCnt(recommendCnt)
                 .build();
     }
-
-
 
 }
