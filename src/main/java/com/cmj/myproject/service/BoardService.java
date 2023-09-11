@@ -131,6 +131,7 @@ public class BoardService {
 
         Page<Comment> commentPage = commentRepository.findCommentsByBoardId(id, pageable);
 
+        // 댓글이 존재하지 않으면서
         if(!commentPage.getContent().isEmpty()){
             // 페이지 번호가 존재하지 않으면 예외 처리
             if (pageable.getPageNumber() >= commentPage.getTotalPages()) {

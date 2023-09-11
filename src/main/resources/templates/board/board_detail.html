@@ -13,7 +13,7 @@
 
                     <div class="card-header">
 
-                        <a class="btn btn-primary float-end" th:href="@{/board(page=${page})}">
+                        <a class="btn btn-primary float-end" th:href="@{/board(page=${p})}">
                             <i class="fas fa-edit"></i> 글 목록
                         </a>
 
@@ -58,15 +58,32 @@
                                     </div>
                                 </div>
                             </th:block>
+                            <div class="pagination justify-content-center">
+                            <th:block th:if="${commentList.totalPages > 1}">
+                                <nav aria-label="Comment Pagination">
+                                    <ul class="pagination">
+                                        <li class="page-item" th:classappend="${commentList.first} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=1, p=${p})}"><<</a>
+                                        </li>
+                                        <li class="page-item" th:classappend="${commentList.first} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.number - 1}, p=${p})}"><</a>
+                                        </li>
+                                        <li class="page-item" th:each="i : ${#numbers.sequence(1, commentList.totalPages)}" th:classappend="${commentList.number + 1 == i} ? 'active' : ''">
+                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${i}, p=${p})}" th:text="${i}"></a>
+                                        </li>
+                                        <li class="page-item" th:classappend="${commentList.last} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.number + 1}, p=${p})}">></a>
+                                        </li>
+                                        <li class="page-item" th:classappend="${commentList.last} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.totalPages}, p=${p})}"> >></a>
+                                        </li>
 
-                            <th:block th:if="${commentList.size == 0}">
-                                <div class="card mb-4">
-                                    <div class="card-body">
-                                        <p>댓글이 없습니다.</p>
-                                    </div>
-                                </div>
+                                    </ul>
+                                </nav>
                             </th:block>
-                        </div> <!-- 댓글을 표시할 컨테이너 -->
+                            </div>
+                        </div>
+
                         <!-- 댓글 작성 폼 -->
                         <form id="commentForm" method="post" onsubmit="submitComment(event)">
                             <div class="form-group">
@@ -119,7 +136,7 @@
                 .then(response => {
                     if (response.ok) {
                         // Comment was added successfully, so redirect to the current board page
-                        window.location.href = '/board/' +  boardId + '?page=' + /*[[${page}]]*/;
+                        window.location.href = '/board/' +  boardId + '?page=' + /*[[${p}]]*/;
                     } else {
                         console.error("Failed to add a comment");
                     }

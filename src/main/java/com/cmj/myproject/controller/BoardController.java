@@ -78,14 +78,14 @@ public class BoardController {
 
     @GetMapping("{id}")
     public ModelAndView detail(@PathVariable("id") Long id,
-                               @RequestParam(defaultValue = "1") int page, ModelAndView mv,
+                               @RequestParam(defaultValue = "1", value = "p") int p, ModelAndView mv,
                                @AuthenticationPrincipal CustomUserDetails userDetails,
                                @PageableDefault(size = 5, page = 1) Pageable pageable) {
 
         try {
             BoardDto dto = boardService.findBoardById(id, session.getId());
             mv.addObject("b", dto);
-            mv.addObject("page", page);
+            mv.addObject("p", p);
             mv.addObject("m", userDetails);
             mv.setViewName("board/board_detail");
 
