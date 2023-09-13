@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.cmj.myproject.util.RedisUtil.calculateTimeUntilMidnight;
 
 @Service
@@ -124,23 +127,11 @@ public class BoardService {
     }
 
 
-    public Page<CommentDto> findCommentList(Long id, Pageable pageable) {
+    public List<CommentDto> findCommentList(Long id) {
 
-        int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1); // page는 index 처럼 0부터 시작
-        pageable = PageRequest.of(page, 5, Sort.by("id").descending());
+        List<Comment> commentList = commentRepository.findCommentsByBoardId(id);
 
-        Page<Comment> commentPage = commentRepository.findCommentsByBoardId(id, pageable);
-
-        // 댓글이 존재하지 않으면서
-        if(!commentPage.getContent().isEmpty()){
-            // 페이지 번호가 존재하지 않으면 예외 처리
-            if (pageable.getPageNumber() >= commentPage.getTotalPages()) {
-                throw new IllegalArgumentException("해당 페이지가 존재하지 않습니다.");
-            }
-        }
-
-        return commentPage.map(Comment::toDto);
-
+         return commentList.stream().map(Comment::toDto).collect(Collectors.toList());
     }
 
     public void saveComment(Long id, CommentDto dto) {
@@ -158,5 +149,10 @@ public class BoardService {
             throw new IllegalArgumentException("댓글 저장 중에 문제가 발생했습니다.");
         }
 
+    }
+
+    public CommentDto findCommentById(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + id));
+        return comment.toDto();
     }
 }

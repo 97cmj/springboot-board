@@ -1,6 +1,7 @@
 package com.cmj.myproject.controller;
 
 import com.cmj.myproject.config.security.CustomUserDetails;
+import com.cmj.myproject.domain.Comment;
 import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.service.BoardService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -78,18 +80,17 @@ public class BoardController {
 
     @GetMapping("{id}")
     public ModelAndView detail(@PathVariable("id") Long id,
-                               @RequestParam(defaultValue = "1", value = "p") int p, ModelAndView mv,
-                               @AuthenticationPrincipal CustomUserDetails userDetails,
-                               @PageableDefault(size = 5, page = 1) Pageable pageable) {
+                               @RequestParam(defaultValue = "1", value = "page") int page, ModelAndView mv,
+                               @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
             BoardDto dto = boardService.findBoardById(id, session.getId());
             mv.addObject("b", dto);
-            mv.addObject("p", p);
+
             mv.addObject("m", userDetails);
             mv.setViewName("board/board_detail");
 
-            Page<CommentDto> commentList = boardService.findCommentList(id, pageable);
+            List<CommentDto> commentList = boardService.findCommentList(id);
             mv.addObject("commentList", commentList);
 
         } catch (IllegalArgumentException e) {
@@ -162,7 +163,11 @@ public class BoardController {
 
         try {
             boardService.saveComment(id, dto);
-            return new ResponseEntity(HttpStatus.OK);
+            List<CommentDto> commentList = boardService.findCommentList(id);
+
+            return new ResponseEntity(commentList, HttpStatus.OK);
+
+
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

@@ -55,33 +55,22 @@
                                         <p>내용</p>
                                         <p><span th:text="${c.content}"></span></p>
                                         <p>작성자 ) <span th:text="${c.writer}"></span></p>
+<!--                                        수정,삭제는 댓글 작성한 사람만 가능하다 -->
+                                        <th:block th:if="${m.getEmail().equals(c.writerId)}">
+                                            <a class="btn btn-primary float-end" style="margin-right : 10px;"
+                                               th:href="@{/board/{id}/comment/{commentId}/delete(id=${b.id}, commentId=${c.id})}">
+                                                <i class="fas fa-edit"></i> 삭제
+                                            </a>
+                                            <a class="btn btn-primary float-end" style="margin-right : 10px;"
+                                               th:href="@{/board/{id}/comment/{commentId}/update(id=${b.id}, commentId=${c.id})}">
+                                                <i class="fas fa-edit"></i> 수정
+                                            </a>
+                                        </th:block>
+
+
                                     </div>
                                 </div>
                             </th:block>
-                            <div class="pagination justify-content-center">
-                            <th:block th:if="${commentList.totalPages > 1}">
-                                <nav aria-label="Comment Pagination">
-                                    <ul class="pagination">
-                                        <li class="page-item" th:classappend="${commentList.first} ? 'disabled' : ''">
-                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=1, p=${p})}"><<</a>
-                                        </li>
-                                        <li class="page-item" th:classappend="${commentList.first} ? 'disabled' : ''">
-                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.number - 1}, p=${p})}"><</a>
-                                        </li>
-                                        <li class="page-item" th:each="i : ${#numbers.sequence(1, commentList.totalPages)}" th:classappend="${commentList.number + 1 == i} ? 'active' : ''">
-                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${i}, p=${p})}" th:text="${i}"></a>
-                                        </li>
-                                        <li class="page-item" th:classappend="${commentList.last} ? 'disabled' : ''">
-                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.number + 1}, p=${p})}">></a>
-                                        </li>
-                                        <li class="page-item" th:classappend="${commentList.last} ? 'disabled' : ''">
-                                            <a class="page-link" th:href="@{/board/{id}(id=${b.id}, page=${commentList.totalPages}, p=${p})}"> >></a>
-                                        </li>
-
-                                    </ul>
-                                </nav>
-                            </th:block>
-                            </div>
                         </div>
 
                         <!-- 댓글 작성 폼 -->
@@ -133,17 +122,11 @@
                 method: 'POST',
                 body: formData,
             })
-                .then(response => {
-                    if (response.ok) {
-                        // Comment was added successfully, so redirect to the current board page
-                        window.location.href = '/board/' +  boardId + '?page=' + /*[[${p}]]*/;
-                    } else {
-                        console.error("Failed to add a comment");
-                    }
+                //json 형태로 받아온다
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
                 })
-                .catch(error => {
-                    console.error("Request error:", error);
-                });
         }
 
     </script>
