@@ -129,7 +129,9 @@ public class BoardService {
 
     public List<CommentDto> findCommentList(Long id) {
 
-        List<Comment> commentList = commentRepository.findCommentsByBoardId(id);
+        List<Comment> commentList = commentRepository.findByBoardId(id);
+
+
 
          return commentList.stream().map(Comment::toDto).collect(Collectors.toList());
     }

@@ -91,6 +91,7 @@ public class BoardController {
             mv.setViewName("board/board_detail");
 
             List<CommentDto> commentList = boardService.findCommentList(id);
+
             mv.addObject("commentList", commentList);
 
         } catch (IllegalArgumentException e) {
@@ -165,9 +166,9 @@ public class BoardController {
             boardService.saveComment(id, dto);
             List<CommentDto> commentList = boardService.findCommentList(id);
 
+
+
             return new ResponseEntity(commentList, HttpStatus.OK);
-
-
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

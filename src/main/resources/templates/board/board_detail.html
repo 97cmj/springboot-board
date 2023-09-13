@@ -49,20 +49,20 @@
                     <div class="card-body">
                         <!-- 댓글 리스트를 표시하는 부분 -->
                         <div id="comment-container">
-                            <th:block th:if="${commentList.size != 0}"  th:each="c : ${commentList}">
+                            <th:block th:if="${commentList.size != 0}" th:each="c : ${commentList}">
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <p>내용</p>
                                         <p><span th:text="${c.content}"></span></p>
                                         <p>작성자 ) <span th:text="${c.writer}"></span></p>
-<!--                                        수정,삭제는 댓글 작성한 사람만 가능하다 -->
+                                        <!--                                        수정,삭제는 댓글 작성한 사람만 가능하다 -->
                                         <th:block th:if="${m.getEmail().equals(c.writerId)}">
                                             <a class="btn btn-primary float-end" style="margin-right : 10px;"
-                                               th:href="@{/board/{id}/comment/{commentId}/delete(id=${b.id}, commentId=${c.id})}">
+                                               th:href="@{/board/{id}/comment/{commentId}/delete(id=${b.id})}">
                                                 <i class="fas fa-edit"></i> 삭제
                                             </a>
                                             <a class="btn btn-primary float-end" style="margin-right : 10px;"
-                                               th:href="@{/board/{id}/comment/{commentId}/update(id=${b.id}, commentId=${c.id})}">
+                                               th:href="@{/board/{id}/comment/{commentId}/update(id=${b.id})}">
                                                 <i class="fas fa-edit"></i> 수정
                                             </a>
                                         </th:block>
@@ -76,7 +76,8 @@
                         <!-- 댓글 작성 폼 -->
                         <form id="commentForm" method="post" onsubmit="submitComment(event)">
                             <div class="form-group">
-                                <textarea class="form-control" name="content" placeholder="댓글을 입력하세요." required></textarea>
+                                <textarea class="form-control" name="content" placeholder="댓글을 입력하세요."
+                                          required></textarea>
                                 <input type="hidden" name="writer" th:value="${m.getName()}">
                                 <input type="hidden" name="writerId" th:value="${m.getEmail()}">
                             </div>
@@ -122,15 +123,50 @@
                 method: 'POST',
                 body: formData,
             })
-                //json 형태로 받아온다
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    // Get the last comment in the data array
+                    const lastComment = data[data.length - 1];
+
+                    const memberEmail = /*[[${m.getEmail()}]]*/;
+                    const b = /*[[${b.id}]]*/;
+
+                    const commentContainer = document.getElementById('comment-container');
+                    const commentCard = document.createElement('div');
+                    commentCard.className = 'card mb-4';
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    cardBody.innerHTML = `
+                <p>내용</p>
+                <p><span>${lastComment.content}</span></p>
+                <p>작성자 ) <span>${lastComment.writer}</span></p>
+            `;
+
+                    if (memberEmail === lastComment.writerId) {
+                        const deleteButton = document.createElement('a');
+                        deleteButton.className = 'btn btn-primary float-end';
+                        deleteButton.style.marginRight = '10px';
+                        deleteButton.href = `/board/${boardId}/comment/${lastComment.id}/delete`;
+                        deleteButton.innerHTML = '<i class="fas fa-edit"></i> 삭제';
+
+                        const updateButton = document.createElement('a');
+                        updateButton.className = 'btn btn-primary float-end';
+                        updateButton.style.marginRight = '10px';
+                        updateButton.href = `/board/${boardId}/comment/${lastComment.id}/update`;
+                        updateButton.innerHTML = '<i class="fas fa-edit"></i> 수정';
+
+                        cardBody.appendChild(deleteButton);
+                        cardBody.appendChild(updateButton);
+                    }
+
+                    commentCard.appendChild(cardBody);
+                    commentContainer.appendChild(commentCard);
                 })
         }
 
-    </script>
 
+
+    </script>
 
 
 </th:block>

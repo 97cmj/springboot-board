@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-        //desc
+        //desc는 내림차순, asc는 오름차순
+        List<Comment> findByBoardId(Long boardId);
 
-        List<Comment> findCommentsByBoardId(Long boardId);
+
+
 
 }
