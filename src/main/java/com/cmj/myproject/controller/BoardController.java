@@ -176,6 +176,22 @@ public class BoardController {
         }
     }
 
+    @PostMapping("{id}/comment/{commentId}/update")
+    @ResponseBody
+    public ResponseEntity updateComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId, CommentDto dto) {
+
+        try {
+            boardService.updateComment(commentId, dto);
+            List<CommentDto> commentList = boardService.findCommentList(id);
+
+            return new ResponseEntity(commentList, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 }

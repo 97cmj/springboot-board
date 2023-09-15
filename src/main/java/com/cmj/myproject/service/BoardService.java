@@ -157,4 +157,8 @@ public class BoardService {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + id));
         return comment.toDto();
     }
+
+    public void updateComment(Long commentId, CommentDto dto) {
+
+    }
 }
