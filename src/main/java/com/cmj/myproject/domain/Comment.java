@@ -46,4 +46,10 @@ public class Comment extends BaseEntity {
                 .recommendCnt(recommendCnt)
                 .build();
     }
+
+    public Comment update(CommentDto dto) {
+        this.content = dto.getContent();
+        return this;
+    }
+
 }

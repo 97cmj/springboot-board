@@ -127,11 +127,11 @@ public class BoardService {
     }
 
 
+
+
     public List<CommentDto> findCommentList(Long id) {
 
         List<Comment> commentList = commentRepository.findByBoardId(id);
-
-
 
          return commentList.stream().map(Comment::toDto).collect(Collectors.toList());
     }
@@ -158,7 +158,20 @@ public class BoardService {
         return comment.toDto();
     }
 
-    public void updateComment(Long commentId, CommentDto dto) {
+    public CommentDto updateComment(Long commentId, CommentDto dto) {
+
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + commentId));
+        try {
+
+//            checkIfUserIsAuthor(board, "수정");
+            commentRepository.save(comment.update(dto));
+
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("게시글 수정 중에 문제가 발생했습니다.");
+        }
+
+        return comment.toDto();
 
     }
 }
