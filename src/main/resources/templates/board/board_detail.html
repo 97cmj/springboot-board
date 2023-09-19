@@ -100,27 +100,40 @@
                                                 <p><span th:text="${c.writer}"></span>
                                                     <i class="fas fa-user"></i>
                                                 </p>
-
                                             </div>
                                         </div>
                                         <div class="comment-content">
                                             <!-- Display comment content in a white box with a smaller border -->
                                             <div class="comment-box">
+                                                <!-- 수정 모드에서 보일 텍스트 영역 -->
+                                                <textarea class="form-control comment-textarea" style="display: none;"></textarea>
+                                                <!-- 댓글 내용 -->
                                                 <p><span th:text="${c.content}"></span></p>
                                             </div>
                                         </div>
                                         <!-- 수정, 삭제는 댓글 작성한 사람만 가능하다 -->
                                         <th:block th:if="${m.getEmail().equals(c.writerId)}">
                                             <div class="button-container">
+                                                <!-- 수정 버튼 -->
                                                 <a class="btn btn-sm btn-primary float-right edit-comment-btn"
                                                    th:data-comment-id="${c.id}">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
-                                                <a class="btn btn-sm btn-primary float-right"
-                                                   th:href="@{/board/{id}/comment/{commentId}/delete(id=${b.id})}">
+                                                <!-- 삭제 버튼 -->
+                                                <a class="btn btn-sm btn-primary float-right delete-comment-btn"
+                                                   th:data-comment-id="${c.id}">
                                                     <i class="fas fa-trash"></i> 삭제
                                                 </a>
-
+                                                <!-- 저장 버튼 (수정 모드에서만 보이게 함) -->
+                                                <a class="btn btn-sm btn-primary float-right save-comment-btn"
+                                                   th:data-comment-id="${c.id}" style="display: none;">
+                                                    <i class="fas fa-save"></i> 저장
+                                                </a>
+                                                <!-- 취소 버튼 (수정 모드에서만 보이게 함) -->
+                                                <a class="btn btn-sm btn-primary float-right cancel-edit-btn"
+                                                   th:data-comment-id="${c.id}" style="display: none;">
+                                                    <i class="fas fa-times"></i> 취소
+                                                </a>
                                             </div>
                                         </th:block>
                                     </div>
@@ -183,7 +196,6 @@
                 .then(data => {
                     // Get the last comment in the data array
                     const lastComment = data[data.length - 1];
-
                     const memberEmail = /*[[${m.getEmail()}]]*/;
                     const b = /*[[${b.id}]]*/;
 
@@ -220,139 +232,110 @@
                 })
         }
 
+        // 수정 버튼 클릭 시
+        $('.edit-comment-btn').click(function () {
+            var commentId = $(this).data('comment-id');
+            console.log(commentId);
+            // 해당 댓글의 수정 버튼
+            var editBtn = $(this);
+            // 해당 댓글의 삭제 버튼
+            var deleteBtn = editBtn.siblings('.delete-comment-btn');
+            // 해당 댓글의 취소 버튼
+            var cancelBtn = editBtn.siblings('.cancel-edit-btn');
+            // 해당 댓글의 저장 버튼
+            var saveBtn = editBtn.siblings('.save-comment-btn');
+            // 해당 댓글의 댓글 내용
+            var commentContent = editBtn.closest('.comment-content').find('.comment-box p span');
+            // 해당 댓글의 텍스트 영역
+            var textarea = editBtn.closest('.comment-content').find('.comment-textarea');
 
-        $(document).ready(function () {
-            // Event delegation to handle edit-comment-btn click events
+            // 현재 댓글 내용을 텍스트 영역에 설정
+            textarea.val(commentContent.text());
+            // 댓글 내용을 숨기고 텍스트 영역을 보이게 함
+            commentContent.hide();
+            textarea.show();
 
-            $('#comment-container').on('click', '.edit-comment-btn', function () {
-                const commentId = $(this).data('comment-id');
-                const commentContainer = $(this).closest('.card');
-                const commentContent = commentContainer.find('.comment-content p span');
-                const boardId = /*[[${b.id}]]*/;
-                commentContent.data('original-content', commentContent.text());
-                // Create a form element
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = `/board/${boardId}/comment/${commentId}/update`;
-
-                // Create a textarea element
-                const textarea = document.createElement('textarea');
-                textarea.className = 'form-control';
-                textarea.name = 'content';
-                textarea.required = true;
-                textarea.textContent = commentContent.text(); // Set the value of the textarea to the comment content
-
-                // Create a hidden input element for the writer
-                const writer = document.createElement('input');
-                writer.type = 'hidden';
-                writer.name = 'writer';
-                writer.value = /*[[${m.getName()}]]*/;
-
-                // Create a cancel button with the icon
-                const cancelButton = document.createElement('a');
-                cancelButton.className = 'btn btn-sm btn-primary float-right cancel-edit-btn';
-                cancelButton.setAttribute('th:data-comment-id', commentId);
-                cancelButton.innerHTML = '<i class="fas fa-edit"></i> 취소';
-
-                // Replace the "삭제" button with the "취소" button
-                const deleteButton = commentContainer.find('.button-container a:last');
-                deleteButton.replaceWith(cancelButton);
-
-                // Append the textarea, hidden input, and "취소" button to the form
-                form.appendChild(textarea);
-                form.appendChild(writer);
-
-                // Replace the comment content with the form
-                commentContent.html(form);
-
-                // Disable the delete button while editing
-                deleteButton.addClass('disabled');
-            });
-
-                // Event delegation to handle cancel-edit-btn click events
-                $('#comment-container').on('click', '.cancel-edit-btn', function () {
-
-                    const commentId = $(this).data('comment-id');
-                    const boardId = /*[[${b.id}]]*/;
-                    const commentContainer = $(this).closest('.card');
-                    const commentContent = commentContainer.find('.comment-content p span');
-
-                    // Check if the comment is being edited
-                    if (commentContainer.find('form').length > 0) {
-                        // Restore the original comment content
-                        const originalContent = commentContent.data('original-content');
-                        commentContent.text(originalContent);
-
-                        console.log(originalContent)
-
-                        // Remove the form
-                        commentContainer.find('form').remove();
-
-                        // Re-enable the delete button
-                        commentContainer.find('.button-container a:last').removeClass('disabled');
-
-                        // Create a delete button with the icon
-                        const deleteButton = document.createElement('a');
-                        deleteButton.className = 'btn btn-sm btn-primary float-right delete-comment-btn';
-                        deleteButton.setAttribute('th:data-comment-id', $(this).data('comment-id'));
-                        deleteButton.href = `/board/${boardId}/comment/${commentId}/delete`;
-                        deleteButton.innerHTML = '<i class="fas fa-trash"></i> 삭제';
-
-                        // Replace the "취소" button with the "삭제" button
-                        $(this).replaceWith(deleteButton);
-                    } else {
-                        // If the comment is not being edited, it's a regular cancel operation
-                        // Create a delete button with the icon
-                        const deleteButton = document.createElement('a');
-                        deleteButton.className = 'btn btn-sm btn-primary float-right delete-comment-btn';
-                        deleteButton.setAttribute('th:data-comment-id', $(this).data('comment-id'));
-                        deleteButton.href = `/board/${boardId}/comment/${commentId}/delete`;
-                        deleteButton.innerHTML = '<i class="fas fa-trash"></i> 삭제';
-
-                        // Replace the "취소" button with the "삭제" button
-                        $(this).replaceWith(deleteButton);
-                    }
-                });
-
-            // Handle form submission to update the comment
-            $('#comment-container').on('submit', 'form', function (event) {
-                event.preventDefault(); // Prevent form submission
-                const formData = new FormData(this);
-
-                // Send an AJAX request to update the comment
-                $.ajax({
-                    type: 'POST',
-                    url: this.action,
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        // Update the comment content in real-time
-                        const commentContainer = $(event.target).closest('.card');
-                        const commentContent = commentContainer.find('.comment-content p span');
-                        commentContent.text(response.content);
-
-                        // Remove the form and reset the "취소" button text to "수정"
-                        commentContainer.find('form').remove();
-
-                        // Create an edit button with the icon
-                        const editButton = document.createElement('a');
-                        editButton.className = 'btn btn-sm btn-primary float-right edit-comment-btn';
-                        editButton.setAttribute('th:data-comment-id', $(event.target).find('[name="content"]').data('comment-id'));
-                        editButton.innerHTML = '<i class="fas fa-edit"></i> 수정';
-
-                        // Replace the "취소" button with the "수정" button
-                        commentContainer.find('.button-container a:last').replaceWith(editButton);
-
-                        // Re-enable the delete button
-                        commentContainer.find('.button-container a:last').removeClass('disabled');
-                    },
-                    error: function () {
-                        alert('댓글 수정에 실패하였습니다.');
-                    }
-                });
-            });
+            // 수정 버튼을 숨기고
+            editBtn.hide();
+            // 삭제 버튼을 숨기고
+            deleteBtn.hide();
+            // 취소 버튼을 보이게 하고
+            cancelBtn.show();
+            // 저장 버튼을 보이게 함
+            saveBtn.show();
         });
+
+        // 취소 버튼 클릭 시
+        $('.cancel-edit-btn').click(function () {
+            var commentId = $(this).data('comment-id');
+            console.log(commentId);
+            // 해당 댓글의 취소 버튼
+            var cancelBtn = $(this);
+            // 해당 댓글의 수정 버튼
+            var editBtn = cancelBtn.siblings('.edit-comment-btn');
+            // 해당 댓글의 삭제 버튼
+            var deleteBtn = cancelBtn.siblings('.delete-comment-btn');
+            // 해당 댓글의 저장 버튼
+            var saveBtn = cancelBtn.siblings('.save-comment-btn');
+            // 해당 댓글의 댓글 내용
+            var commentContent = cancelBtn.closest('.comment-content').find('.comment-box p span');
+            // 해당 댓글의 텍스트 영역
+            var textarea = cancelBtn.closest('.comment-content').find('.comment-textarea');
+
+            // 텍스트 영역을 숨기고
+            textarea.hide();
+            // 댓글 내용을 보이게 함
+            commentContent.show();
+
+            // 취소 버튼을 숨기고
+            cancelBtn.hide();
+            // 수정 버튼을 보이게 하고
+            editBtn.show();
+            // 삭제 버튼을 보이게 함
+            deleteBtn.show();
+            // 저장 버튼을 숨기게 함
+            saveBtn.hide();
+        });
+
+        // 저장 버튼 클릭 시
+        $('.save-comment-btn').click(function () {
+            var commentId = $(this).data('comment-id');
+            console.log(commentId);
+            // 해당 댓글의 저장 버튼
+            var saveBtn = $(this);
+            // 해당 댓글의 수정 버튼
+            var editBtn = saveBtn.siblings('.edit-comment-btn');
+            // 해당 댓글의 삭제 버튼
+            var deleteBtn = saveBtn.siblings('.delete-comment-btn');
+            // 해당 댓글의 취소 버튼
+            var cancelBtn = saveBtn.siblings('.cancel-edit-btn');
+            // 해당 댓글의 댓글 내용
+            var commentContent = saveBtn.closest('.comment-content').find('.comment-box p span');
+            // 해당 댓글의 텍스트 영역
+            var textarea = saveBtn.closest('.comment-content').find('.comment-textarea');
+            // 수정한 댓글 내용
+            var editedContent = textarea.val();
+
+            // 수정한 댓글 내용을 화면에 업데이트
+            commentContent.text(editedContent);
+
+            // 텍스트 영역을 숨기고
+            textarea.hide();
+            // 댓글 내용을 보이게 함
+            commentContent.show();
+
+            // 저장 버튼을 숨기고
+            saveBtn.hide();
+            // 수정 버튼을 보이게 하고
+            editBtn.show();
+            // 삭제 버튼을 보이게 함
+            deleteBtn.show();
+            // 취소 버튼을 숨기게 함
+            cancelBtn.hide();
+        });
+
+
+
 
 
     </script>
