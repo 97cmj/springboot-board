@@ -192,7 +192,6 @@
                     });
             }
         }
-
         function submitComment(event) {
             event.preventDefault(); // Prevent the default form submission
 
@@ -211,31 +210,29 @@
                     const lastComment = data[data.length - 1];
                     const memberEmail = /*[[${m.getEmail()}]]*/;
 
-                    // Create a new comment card
                     const commentCard = $('<div>').addClass('card mb-4');
 
                     // Create a comment header
                     const commentHeader = $('<div>').addClass('comment-header');
 
-                    // Create a writer box
+                    // Display writer's name in a gray box
                     const writerBox = $('<div>').addClass('writer-box');
-                    writerBox.html(`
-                <p><span>${lastComment.writer}</span>
-                    <i class="fas fa-user"></i>
-                </p>
-            `);
+                    writerBox.html('<p><span>' + lastComment.writer + ' ' + '</span><i class="fas fa-user"></i></p>');
 
-                    // Append writer box to comment header
                     commentHeader.append(writerBox);
 
+                    // Create a comment content section
                     const commentContent = $('<div>').addClass('comment-content');
                     commentContent.attr('id', `comment-${lastComment.id}`);
 
+                    // Create a comment box
                     const commentBox = $('<div>').addClass('comment-box');
 
+                    // Display the original comment content
                     const commentText = $('<span>').addClass('comment-text');
                     commentText.text(lastComment.content);
 
+                    // Create an edit mode textarea (initially hidden)
                     const commentTextarea = $('<textarea>').addClass('form-control comment-textarea');
                     commentTextarea.css('display', 'none');
 
@@ -248,21 +245,27 @@
                     buttonContainer.attr('id', `comment-${lastComment.id}`);
 
                     if (memberEmail === lastComment.writerId) {
-
-                        const deleteButton = $('<a>').addClass('btn btn-sm btn-primary float-right delete-comment-btn');
-                        deleteButton.attr('href', `/board/${boardId}/comment/${lastComment.id}/delete`);
-                        deleteButton.html('<i class="fas fa-trash"></i> 삭제');
-
-                        // Create an update button
                         const updateButton = $('<a>').addClass('btn btn-sm btn-primary float-right edit-comment-btn');
                         updateButton.attr('th:data-comment-id', lastComment.id);
                         updateButton.html('<i class="fas fa-edit"></i> 수정');
 
+                        const deleteButton = $('<a>').addClass('btn btn-sm btn-primary float-right delete-comment-btn');
+                        deleteButton.attr('href', `/board/${boardId}/comment/${lastComment.id}/delete`);
+
+                        deleteButton.css('margin-left', '5.5px');
+                        deleteButton.html('<i class="fas fa-trash"></i> 삭제');
+
+                        // Create an update button
+
+
                         // Append delete and update buttons to button container
-                        buttonContainer.append(deleteButton);
+
                         buttonContainer.append(updateButton);
+                        buttonContainer.append(deleteButton);
                     }
 
+                    // Append comment header, comment content, and button container to comment card
+                    commentCard.append(commentHeader);
                     commentCard.append(commentContent);
                     commentCard.append(buttonContainer);
 
@@ -272,7 +275,8 @@
                 });
         }
 
-        function editComment(commentId) {
+
+            function editComment(commentId) {
             const commentText = $(`#comment-${commentId} .comment-text`);
             const commentTextarea = $(`#comment-${commentId} .comment-textarea`);
             const saveButton = $(`#comment-${commentId} .save-comment-btn`);
