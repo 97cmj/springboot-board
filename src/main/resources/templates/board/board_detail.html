@@ -102,38 +102,50 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="comment-content">
+                                        <div class="comment-content" th:id="'comment-' + ${c.id}">
                                             <!-- Display comment content in a white box with a smaller border -->
                                             <div class="comment-box">
-                                                <!-- 수정 모드에서 보일 텍스트 영역 -->
-                                                <textarea class="form-control comment-textarea" style="display: none;"></textarea>
-                                                <!-- 댓글 내용 -->
-                                                <p><span th:text="${c.content}"></span></p>
+                                                <!-- Display the original comment content -->
+                                                <span th:text="${c.content}" class="comment-text"></span>
+                                                <!-- Edit mode textarea (initially hidden) -->
+                                                <textarea class="form-control comment-textarea"
+                                                          style="display: none;"></textarea>
                                             </div>
                                         </div>
                                         <!-- 수정, 삭제는 댓글 작성한 사람만 가능하다 -->
                                         <th:block th:if="${m.getEmail().equals(c.writerId)}">
-                                            <div class="button-container">
+                                            <div class="button-container" th:id="'comment-' + ${c.id}">
                                                 <!-- 수정 버튼 -->
                                                 <a class="btn btn-sm btn-primary float-right edit-comment-btn"
-                                                   th:data-comment-id="${c.id}">
+                                                   th:data-comment-id="${c.id}"
+                                                   th:onclick="'editComment(' + ${c.id} + ')'">
                                                     <i class="fas fa-edit"></i> 수정
                                                 </a>
                                                 <!-- 삭제 버튼 -->
                                                 <a class="btn btn-sm btn-primary float-right delete-comment-btn"
-                                                   th:data-comment-id="${c.id}">
+                                                   th:data-comment-id="${c.id}"
+                                                   th:onclick="'deleteComment(' + ${c.id} + ')'">
+
                                                     <i class="fas fa-trash"></i> 삭제
                                                 </a>
-                                                <!-- 저장 버튼 (수정 모드에서만 보이게 함) -->
+
+                                                <!-- 저장 버튼 -->
                                                 <a class="btn btn-sm btn-primary float-right save-comment-btn"
-                                                   th:data-comment-id="${c.id}" style="display: none;">
-                                                    <i class="fas fa-save"></i> 저장
+                                                   th:data-comment-id="${c.id}"
+                                                   th:onclick="'saveComment(' + ${c.id} + ')'"
+                                                   style="display: none;">
+                                                    <i class="fas fa-floppy-disk"></i> 저장
                                                 </a>
-                                                <!-- 취소 버튼 (수정 모드에서만 보이게 함) -->
+
+                                                <!-- 취소 버튼 -->
                                                 <a class="btn btn-sm btn-primary float-right cancel-edit-btn"
-                                                   th:data-comment-id="${c.id}" style="display: none;">
-                                                    <i class="fas fa-times"></i> 취소
+                                                   th:data-comment-id="${c.id}"
+                                                   th:onclick="'cancelEdit(' + ${c.id} + ')'"
+                                                   style="display: none;">
+                                                    <i class="fas fa-trash"></i> 취소
                                                 </a>
+
+
                                             </div>
                                         </th:block>
                                     </div>
@@ -145,7 +157,8 @@
                     <!-- 댓글 작성 폼 -->
                     <form id="commentForm" method="post" onsubmit="submitComment(event)">
                         <div class="form-group">
-                                <textarea class="form-control" name="content" placeholder="댓글을 입력하세요."
+                                <textarea class="form-control form-insert-comment" name="content"
+                                          placeholder="댓글을 입력하세요."
                                           required></textarea>
                             <input type="hidden" name="writer" th:value="${m.getName()}">
                             <input type="hidden" name="writerId" th:value="${m.getEmail()}">
@@ -155,9 +168,7 @@
                 </div>
             </div>
         </div>
-        </div>
     </main>
-    </body>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -188,6 +199,8 @@
             const formData = new FormData(document.getElementById('commentForm'));
             const boardId = /*[[${b.id}]]*/;
 
+            $('#commentForm').find('textarea').val('');
+
             fetch(`/board/${boardId}/comment`, {
                 method: 'POST',
                 body: formData,
@@ -197,146 +210,163 @@
                     // Get the last comment in the data array
                     const lastComment = data[data.length - 1];
                     const memberEmail = /*[[${m.getEmail()}]]*/;
-                    const b = /*[[${b.id}]]*/;
 
-                    const commentContainer = document.getElementById('comment-container');
-                    const commentCard = document.createElement('div');
-                    commentCard.className = 'card mb-4';
-                    const cardBody = document.createElement('div');
-                    cardBody.className = 'card-body';
-                    cardBody.innerHTML = `
-                <p>내용</p>
-                <p><span>${lastComment.content}</span></p>
-                <p>작성자 ) <span>${lastComment.writer}</span></p>
-            `;
+                    // Create a new comment card
+                    const commentCard = $('<div>').addClass('card mb-4');
+
+                    // Create a comment header
+                    const commentHeader = $('<div>').addClass('comment-header');
+
+                    // Create a writer box
+                    const writerBox = $('<div>').addClass('writer-box');
+                    writerBox.html(`
+                <p><span>${lastComment.writer}</span>
+                    <i class="fas fa-user"></i>
+                </p>
+            `);
+
+                    // Append writer box to comment header
+                    commentHeader.append(writerBox);
+
+                    const commentContent = $('<div>').addClass('comment-content');
+                    commentContent.attr('id', `comment-${lastComment.id}`);
+
+                    const commentBox = $('<div>').addClass('comment-box');
+
+                    const commentText = $('<span>').addClass('comment-text');
+                    commentText.text(lastComment.content);
+
+                    const commentTextarea = $('<textarea>').addClass('form-control comment-textarea');
+                    commentTextarea.css('display', 'none');
+
+                    commentBox.append(commentText);
+                    commentBox.append(commentTextarea);
+
+                    commentContent.append(commentBox);
+
+                    const buttonContainer = $('<div>').addClass('button-container');
+                    buttonContainer.attr('id', `comment-${lastComment.id}`);
 
                     if (memberEmail === lastComment.writerId) {
-                        const deleteButton = document.createElement('a');
-                        deleteButton.className = 'btn btn-primary float-end';
-                        deleteButton.style.marginRight = '10px';
-                        deleteButton.href = `/board/${boardId}/comment/${lastComment.id}/delete`;
-                        deleteButton.innerHTML = '<i class="fas fa-edit"></i> 삭제';
 
-                        const updateButton = document.createElement('a');
-                        updateButton.className = 'btn btn-primary float-end edit-comment-btn';
-                        updateButton.style.marginRight = '10px';
-                        updateButton.setAttribute('th:data-comment-id', lastComment.id);
-                        updateButton.innerHTML = '<i class="fas fa-edit"></i> 수정';
+                        const deleteButton = $('<a>').addClass('btn btn-sm btn-primary float-right delete-comment-btn');
+                        deleteButton.attr('href', `/board/${boardId}/comment/${lastComment.id}/delete`);
+                        deleteButton.html('<i class="fas fa-trash"></i> 삭제');
 
-                        cardBody.appendChild(deleteButton);
-                        cardBody.appendChild(updateButton);
+                        // Create an update button
+                        const updateButton = $('<a>').addClass('btn btn-sm btn-primary float-right edit-comment-btn');
+                        updateButton.attr('th:data-comment-id', lastComment.id);
+                        updateButton.html('<i class="fas fa-edit"></i> 수정');
+
+                        // Append delete and update buttons to button container
+                        buttonContainer.append(deleteButton);
+                        buttonContainer.append(updateButton);
                     }
 
-                    commentCard.appendChild(cardBody);
-                    commentContainer.appendChild(commentCard);
+                    commentCard.append(commentContent);
+                    commentCard.append(buttonContainer);
+
+                    // Get the comment container and append the comment card
+                    const commentContainer = $('#comment-container');
+                    commentContainer.append(commentCard);
+                });
+        }
+
+        function editComment(commentId) {
+            const commentText = $(`#comment-${commentId} .comment-text`);
+            const commentTextarea = $(`#comment-${commentId} .comment-textarea`);
+            const saveButton = $(`#comment-${commentId} .save-comment-btn`);
+            const cancelButton = $(`#comment-${commentId} .cancel-edit-btn`);
+            const editButton = $(`#comment-${commentId} .edit-comment-btn`);
+            const deleteButton = $(`#comment-${commentId} .delete-comment-btn`);
+
+            commentText.hide();
+            commentTextarea.show();
+            commentTextarea.val(commentText.text());
+
+            saveButton.show();
+            cancelButton.show();
+
+            editButton.hide();
+            deleteButton.hide();
+
+
+        }
+
+        function saveComment(commentId) {
+            const commentText = $(`#comment-${commentId} .comment-text`);
+            const commentTextarea = $(`#comment-${commentId} .comment-textarea`);
+            const saveButton = $(`#comment-${commentId} .save-comment-btn`);
+            const cancelButton = $(`#comment-${commentId} .cancel-edit-btn`);
+            const editButton = $(`#comment-${commentId} .edit-comment-btn`);
+            const deleteButton = $(`#comment-${commentId} .delete-comment-btn`);
+            const b = /*[[${b.id}]]*/;
+
+            const formData = new FormData();
+            formData.append('content', commentTextarea.val());
+
+            fetch(`/board/${b}/comment/${commentId}/update`, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    commentText.text(data.content);
+                    commentText.show();
+                    commentTextarea.hide();
+
+                    saveButton.hide();
+                    cancelButton.hide();
+
+                    editButton.show();
+                    deleteButton.show();
                 })
         }
 
-        // 수정 버튼 클릭 시
-        $('.edit-comment-btn').click(function () {
-            var commentId = $(this).data('comment-id');
-            console.log(commentId);
-            // 해당 댓글의 수정 버튼
-            var editBtn = $(this);
-            // 해당 댓글의 삭제 버튼
-            var deleteBtn = editBtn.siblings('.delete-comment-btn');
-            // 해당 댓글의 취소 버튼
-            var cancelBtn = editBtn.siblings('.cancel-edit-btn');
-            // 해당 댓글의 저장 버튼
-            var saveBtn = editBtn.siblings('.save-comment-btn');
-            // 해당 댓글의 댓글 내용
-            var commentContent = editBtn.closest('.comment-content').find('.comment-box p span');
-            // 해당 댓글의 텍스트 영역
-            var textarea = editBtn.closest('.comment-content').find('.comment-textarea');
+        function cancelEdit(commentId) {
+            const commentText = $(`#comment-${commentId} .comment-text`);
+            const commentTextarea = $(`#comment-${commentId} .comment-textarea`);
+            const saveButton = $(`#comment-${commentId} .save-comment-btn`);
+            const cancelButton = $(`#comment-${commentId} .cancel-edit-btn`);
+            const editButton = $(`#comment-${commentId} .edit-comment-btn`);
+            const deleteButton = $(`#comment-${commentId} .delete-comment-btn`);
 
-            // 현재 댓글 내용을 텍스트 영역에 설정
-            textarea.val(commentContent.text());
-            // 댓글 내용을 숨기고 텍스트 영역을 보이게 함
-            commentContent.hide();
-            textarea.show();
+            commentText.show();
+            commentTextarea.hide();
 
-            // 수정 버튼을 숨기고
-            editBtn.hide();
-            // 삭제 버튼을 숨기고
-            deleteBtn.hide();
-            // 취소 버튼을 보이게 하고
-            cancelBtn.show();
-            // 저장 버튼을 보이게 함
-            saveBtn.show();
+            saveButton.hide();
+            cancelButton.hide();
+
+            editButton.show();
+            deleteButton.show();
+        }
+
+        function deleteComment(commentId) {
+            if (confirm("정말 삭제하시겠습니까?")) {
+                const boardId = /*[[${b.id}]]*/;
+
+                fetch(`/board/${boardId}/comment/${commentId}/delete`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("삭제 완료");
+                            location.reload();
+                        } else {
+                            console.error("삭제 실패");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("요청 오류:", error);
+                    });
+            }
+        }
+
+        $(function () {
+            //댓글 리스트 실시간 업데이트
+
         });
-
-        // 취소 버튼 클릭 시
-        $('.cancel-edit-btn').click(function () {
-            var commentId = $(this).data('comment-id');
-            console.log(commentId);
-            // 해당 댓글의 취소 버튼
-            var cancelBtn = $(this);
-            // 해당 댓글의 수정 버튼
-            var editBtn = cancelBtn.siblings('.edit-comment-btn');
-            // 해당 댓글의 삭제 버튼
-            var deleteBtn = cancelBtn.siblings('.delete-comment-btn');
-            // 해당 댓글의 저장 버튼
-            var saveBtn = cancelBtn.siblings('.save-comment-btn');
-            // 해당 댓글의 댓글 내용
-            var commentContent = cancelBtn.closest('.comment-content').find('.comment-box p span');
-            // 해당 댓글의 텍스트 영역
-            var textarea = cancelBtn.closest('.comment-content').find('.comment-textarea');
-
-            // 텍스트 영역을 숨기고
-            textarea.hide();
-            // 댓글 내용을 보이게 함
-            commentContent.show();
-
-            // 취소 버튼을 숨기고
-            cancelBtn.hide();
-            // 수정 버튼을 보이게 하고
-            editBtn.show();
-            // 삭제 버튼을 보이게 함
-            deleteBtn.show();
-            // 저장 버튼을 숨기게 함
-            saveBtn.hide();
-        });
-
-        // 저장 버튼 클릭 시
-        $('.save-comment-btn').click(function () {
-            var commentId = $(this).data('comment-id');
-            console.log(commentId);
-            // 해당 댓글의 저장 버튼
-            var saveBtn = $(this);
-            // 해당 댓글의 수정 버튼
-            var editBtn = saveBtn.siblings('.edit-comment-btn');
-            // 해당 댓글의 삭제 버튼
-            var deleteBtn = saveBtn.siblings('.delete-comment-btn');
-            // 해당 댓글의 취소 버튼
-            var cancelBtn = saveBtn.siblings('.cancel-edit-btn');
-            // 해당 댓글의 댓글 내용
-            var commentContent = saveBtn.closest('.comment-content').find('.comment-box p span');
-            // 해당 댓글의 텍스트 영역
-            var textarea = saveBtn.closest('.comment-content').find('.comment-textarea');
-            // 수정한 댓글 내용
-            var editedContent = textarea.val();
-
-            // 수정한 댓글 내용을 화면에 업데이트
-            commentContent.text(editedContent);
-
-            // 텍스트 영역을 숨기고
-            textarea.hide();
-            // 댓글 내용을 보이게 함
-            commentContent.show();
-
-            // 저장 버튼을 숨기고
-            saveBtn.hide();
-            // 수정 버튼을 보이게 하고
-            editBtn.show();
-            // 삭제 버튼을 보이게 함
-            deleteBtn.show();
-            // 취소 버튼을 숨기게 함
-            cancelBtn.hide();
-        });
-
-
-
-
 
     </script>
 

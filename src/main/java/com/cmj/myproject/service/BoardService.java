@@ -126,6 +126,15 @@ public class BoardService {
         }
     }
 
+    private void checkIfUserIsAuthor(Comment comment, String category) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        if ("anonymousUser".equals(email) && !email.equals(comment.getWriterId())) {
+            throw new IllegalArgumentException("작성자만 + " + category + "할 수 있습니다.");
+        }
+    }
+
 
 
 
@@ -164,7 +173,7 @@ public class BoardService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + commentId));
         try {
 
-//            checkIfUserIsAuthor(board, "수정");
+            checkIfUserIsAuthor(comment, "수정");
             commentRepository.save(comment.update(dto));
 
         } catch (DataIntegrityViolationException e) {
@@ -172,6 +181,19 @@ public class BoardService {
         }
 
         return comment.toDto();
+
+    }
+
+    public void deleteComment(Long commentId) {
+
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + commentId));
+
+        try {
+            checkIfUserIsAuthor(comment, "삭제");
+            commentRepository.deleteById(commentId);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("댓글 삭제 중에 문제가 발생했습니다.");
+        }
 
     }
 }

@@ -182,9 +182,24 @@ public class BoardController {
 
         try {
             boardService.updateComment(commentId, dto);
-            List<CommentDto> commentList = boardService.findCommentList(id);
 
-            return new ResponseEntity(commentList, HttpStatus.OK);
+            CommentDto comment = boardService.findCommentById(commentId);
+
+            return new ResponseEntity(comment, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("{id}/comment/{commentId}/delete")
+    @ResponseBody
+    public ResponseEntity deleteComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId) {
+
+        try {
+            boardService.deleteComment(commentId);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
