@@ -25,24 +25,28 @@
                                     <th>조회수</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+
                                 <th:block th:if="${boardList.isEmpty()}">
-                                    <tr style="text-align : center">
-                                        <td colspan="3">게시글이 없습니다.</td>
-                                    </tr>
+                                    <tbody>
+                                        <tr style="text-align : center">
+                                            <td colspan="3">게시글이 없습니다.</td>
+                                        </tr>
+                                    </tbody>
                                 </th:block>
 
                                 <th:block th:if="${!boardList.isEmpty()}">
-                                    <tr th:each="b : ${boardList}">
-                                        <td th:text="${b.id}"></td>
-                                        <td>
-                                            <span th:text="${b.title}"></span>
-                                        </td>
-                                        <td th:text="${b.writer}"></td>
-                                        <td th:text="${b.viewCnt}"></td>
-                                    </tr>
+                                    <tbody style="cursor:pointer">
+                                        <tr th:each="b : ${boardList}">
+                                            <td th:text="${b.id}"></td>
+                                            <td>
+                                                <span th:text="${b.title}"></span>
+                                            </td>
+                                            <td th:text="${b.writer}"></td>
+                                            <td th:text="${b.viewCnt}"></td>
+                                        </tr>
+                                    </tbody>
                                 </th:block>
-                                </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -59,23 +63,29 @@
                             </li>
 
                             <li class="page-item" th:class="${boardList.first} ? 'disabled'">
-                                <a class="page-link" th:href="${boardList.first} ? '#' :@{/board(page=${boardList.number})}" aria-label="Previous">
+                                <a class="page-link"
+                                   th:href="${boardList.first} ? '#' :@{/board(page=${boardList.number})}"
+                                   aria-label="Previous">
                                     <span aria-hidden="true">&lt;</span>
                                 </a>
                             </li>
 
-                            <li th:each="page: ${#numbers.sequence(start, last)}" th:class="${page == boardList.number + 1} ? 'active page-item' : 'page-item'">
+                            <li th:each="page: ${#numbers.sequence(start, last)}"
+                                th:class="${page == boardList.number + 1} ? 'active page-item' : 'page-item'">
                                 <a class="page-link" th:text="${page}" th:href="@{/board(page=${page})}"></a>
                             </li>
 
                             <li class="page-item" th:class="${boardList.last} ? 'disabled'">
-                                <a class="page-link" th:href="${boardList.last} ? '#' : @{/board(page=${boardList.number + 2})}" aria-label="Next">
+                                <a class="page-link"
+                                   th:href="${boardList.last} ? '#' : @{/board(page=${boardList.number + 2})}"
+                                   aria-label="Next">
                                     <span aria-hidden="true">&gt;</span>
                                 </a>
                             </li>
 
                             <li class="page-item" th:class="${boardList.last} ? 'disabled'">
-                                <a class="page-link" th:href="@{/board(page=${boardList.totalPages})}" aria-label="Last">
+                                <a class="page-link" th:href="@{/board(page=${boardList.totalPages})}"
+                                   aria-label="Last">
                                     <span aria-hidden="true">&gt;&gt;</span>
                                 </a>
                             </li>
@@ -85,10 +95,10 @@
             </div>
         </div>
 
-        <script  th:inline="javascript">
+        <script th:inline="javascript">
             /*<![CDATA[*/
             $(document).ready(function () {
-                $("tr").click(function ()  {
+                $("tr").click(function () {
 
                     var id = $(this).find("td:eq(0)").text();
                     const page = /*[[${boardList.getNumber+1}]]*/;
