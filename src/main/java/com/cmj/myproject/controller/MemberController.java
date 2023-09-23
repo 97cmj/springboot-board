@@ -1,10 +1,10 @@
 package com.cmj.myproject.controller;
 
 import com.cmj.myproject.dto.MemberRequestDto;
+import com.cmj.myproject.dto.MemberResponseDto;
 import com.cmj.myproject.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,11 +55,26 @@ public class MemberController {
         return new ModelAndView("member/login");
     }
 
+    @GetMapping("/mypage/{email}")
+    public ModelAndView mypage(@PathVariable String email) {
+        ModelAndView mv = new ModelAndView();
+        log.info("username = {}", email);
+
+        try {
+            MemberResponseDto m = memberService.findByEmail(email);
+            mv.setViewName("member/mypage");
+            mv.addObject("m", m);
+        } catch (IllegalArgumentException e) {
+            setErrorModelAndView(mv, e);
+        }
+        return mv;
+    }
 
 
-
-
-
-
+    public void setErrorModelAndView(ModelAndView mv, Exception e) {
+        mv.setViewName("error/error");
+        mv.addObject("error", e.getMessage());
+        mv.addObject("url", "/");
+    }
 
 }

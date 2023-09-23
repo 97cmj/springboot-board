@@ -3,6 +3,7 @@ package com.cmj.myproject.service;
 import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.domain.Role;
 import com.cmj.myproject.dto.MemberRequestDto;
+import com.cmj.myproject.dto.MemberResponseDto;
 import com.cmj.myproject.exception.DuplicateEmailException;
 import com.cmj.myproject.repository.MemberRepository;
 import lombok.NoArgsConstructor;
@@ -56,14 +57,16 @@ public class MemberService {
 
         Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
 
-        if (Objects.equals(member, null)) {
+        if (member.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
+    }
 
-
-
-
-
-
+    public MemberResponseDto findByEmail(String email) {
+        Optional<Member> member = memberRepository.findByEmail(email);
+        if (member.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+        }
+        return member.get().toDto();
     }
 }

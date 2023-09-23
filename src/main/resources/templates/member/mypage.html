@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+  <main>
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="profile-wrapper mt-3">
+            <img src="//secure.gravatar.com/avatar/02570daa585427c21ba4136f2a886f3a?d=retro&amp;f=y" class="img-fluid rounded-circle" alt="Profile Picture">
+          </div>
+          <h4 class="mt-3" th:text="${'사용자 ' + m.getName() + '님'}"></h4>
+          <p>프로필 소개 부분입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 최근 작성한 게시글 리스트 -->
+    <div class="container mt-4">
+      <h2>최근 작성한 게시글</h2>
+      <ul class="list-group">
+        <li class="list-group-item">게시글 1</li>
+        <li class="list-group-item">게시글 2</li>
+        <li class="list-group-item">게시글 3</li>
+      </ul>
+    </div>
+
+    <!-- 최근 작성한 댓글 리스트 -->
+    <div class="container mt-4">
+      <h2>최근 작성한 댓글</h2>
+      <ul class="list-group">
+        <li class="list-group-item">댓글 1</li>
+        <li class="list-group-item">댓글 2</li>
+        <li class="list-group-item">댓글 3</li>
+      </ul>
+    </div>
+  </main>
+</th:block>
+</html>
