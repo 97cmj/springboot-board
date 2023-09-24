@@ -18,21 +18,72 @@
     <!-- 최근 작성한 게시글 리스트 -->
     <div class="container mt-4">
       <h2>최근 작성한 게시글</h2>
-      <ul class="list-group">
-        <li class="list-group-item">게시글 1</li>
-        <li class="list-group-item">게시글 2</li>
-        <li class="list-group-item">게시글 3</li>
-      </ul>
+
+      <table class="table table-hover table-striped">
+        <thead>
+        <tr>
+          <th>번호</th>
+          <th>제목</th>
+          <th>작성자</th>
+          <th>조회수</th>
+        </tr>
+        </thead>
+
+        <th:block th:if="${b.isEmpty()}">
+          <tbody>
+          <tr style="text-align : center">
+            <td colspan="3">게시글이 없습니다.</td>
+          </tr>
+          </tbody>
+        </th:block>
+
+        <th:block th:if="${!b.isEmpty()}">
+          <tbody style="cursor:pointer">
+          <tr th:each="b : ${b}">
+            <td th:text="${b.id}"></td>
+            <td>
+              <span th:text="${b.title}"></span>
+            </td>
+            <td th:text="${b.writer}"></td>
+            <td th:text="${b.viewCnt}"></td>
+          </tr>
+          </tbody>
+        </th:block>
+      </table>
     </div>
 
     <!-- 최근 작성한 댓글 리스트 -->
     <div class="container mt-4">
       <h2>최근 작성한 댓글</h2>
-      <ul class="list-group">
-        <li class="list-group-item">댓글 1</li>
-        <li class="list-group-item">댓글 2</li>
-        <li class="list-group-item">댓글 3</li>
-      </ul>
+      <table class="table table-hover table-striped">
+        <thead>
+        <tr>
+          <th>번호</th>
+          <th>제목</th>
+          <th>작성자</th>
+        </tr>
+        </thead>
+
+        <th:block th:if="${c.isEmpty()}">
+          <tbody>
+          <tr style="text-align : center">
+            <td colspan="3">댓글이 없습니다.</td>
+          </tr>
+          </tbody>
+        </th:block>
+
+        <th:block th:if="${!c.isEmpty()}">
+          <tbody style="cursor:pointer">
+          <tr th:each="c : ${c}">
+            <td th:text="${c.id}"></td>
+            <td>
+              <span th:text="${c.content}"></span>
+            </td>
+            <td th:text="${c.writer}"></td>
+          </tr>
+          </tbody>
+        </th:block>
+        </table>
     </div>
   </main>
 </th:block>

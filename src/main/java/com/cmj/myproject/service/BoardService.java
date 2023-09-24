@@ -196,4 +196,16 @@ public class BoardService {
         }
 
     }
+
+    //email로 최근 작성한 게시글 15개 가져오기
+    public List<BoardDto> findRecentBoardByEmail(String email) {
+        List<Board> boardList = boardRepository.findTop15ByWriterIdOrderByCreatedAtDesc(email);
+        return boardList.stream().map(Board::toDto).collect(Collectors.toList());
+    }
+
+    //email로 최근 작성한 댓글 15개 가져오기
+    public List<CommentDto> findRecentCommentByEmail(String email) {
+        List<Comment> commentList = commentRepository.findTop15ByWriterIdOrderByCreatedAtDesc(email);
+        return commentList.stream().map(Comment::toDto).collect(Collectors.toList());
+    }
 }

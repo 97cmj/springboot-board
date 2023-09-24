@@ -1,7 +1,10 @@
 package com.cmj.myproject.controller;
 
+import com.cmj.myproject.dto.BoardDto;
+import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.dto.MemberResponseDto;
+import com.cmj.myproject.service.BoardService;
 import com.cmj.myproject.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -21,6 +25,7 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
+    private final BoardService boardService;
 
     @GetMapping("/signup")
     public ModelAndView signUpForm(){
@@ -58,12 +63,19 @@ public class MemberController {
     @GetMapping("/mypage/{email}")
     public ModelAndView mypage(@PathVariable String email) {
         ModelAndView mv = new ModelAndView();
-        log.info("username = {}", email);
 
         try {
             MemberResponseDto m = memberService.findByEmail(email);
+            List<BoardDto> b = boardService.findRecentBoardByEmail(email);
+            List<CommentDto> c = boardService.findRecentCommentByEmail(email);
+
+            log.info("{}", b);
+            log.info("{}", c);
+
             mv.setViewName("member/mypage");
             mv.addObject("m", m);
+            mv.addObject("b", b);
+            mv.addObject("c", c);
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
         }

@@ -2,9 +2,11 @@ package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.domain.Role;
+import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.dto.MemberResponseDto;
 import com.cmj.myproject.exception.DuplicateEmailException;
+import com.cmj.myproject.repository.BoardRepository;
 import com.cmj.myproject.repository.MemberRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +27,13 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BoardRepository boardRepository;
 
     private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
-    public void signUp(MemberRequestDto dto) throws Exception {
+    public void signUp(MemberRequestDto dto) {
         validateDuplicateEmail(dto.getEmail());
 
         if (!StringUtils.equals(dto.getPassword(), dto.getPasswordConfirm())) {
@@ -46,21 +51,12 @@ public class MemberService {
 
     }
 
-    private void validateDuplicateEmail(String email) throws Exception {
+    private void validateDuplicateEmail(String email) {
         if(memberRepository.existsByEmail(email)){
             throw new IllegalArgumentException("중복된 이메일이 존재합니다.");
         }
     }
 
-
-    public void login(MemberRequestDto dto) {
-
-        Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
-
-        if (member.isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
-        }
-    }
 
     public MemberResponseDto findByEmail(String email) {
         Optional<Member> member = memberRepository.findByEmail(email);
