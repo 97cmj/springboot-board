@@ -92,6 +92,11 @@
                         <div class="card-body">
                             <!-- 댓글 리스트를 표시하는 부분 -->
                             <div id="comment-container">
+
+                                <th:block th:if="${commentList.size == 0}">
+                                    <div class="no-comment">댓글이 존재하지 않습니다.</div>
+                                </th:block>
+
                                 <th:block th:if="${commentList.size != 0}" th:each="c : ${commentList}">
                                     <div class="card mb-4">
                                         <div class="comment-header">
@@ -206,6 +211,9 @@
             })
                 .then(response => response.json())
                 .then(data => {
+
+                    $('.no-comment').remove();
+
                     // Get the last comment in the data array
                     const lastComment = data[data.length - 1];
                     const memberEmail = /*[[${m.getEmail()}]]*/;
@@ -250,7 +258,10 @@
                         updateButton.html('<i class="fas fa-edit"></i> 수정');
 
                         const deleteButton = $('<a>').addClass('btn btn-sm btn-primary float-right delete-comment-btn');
-                        deleteButton.attr('href', `/board/${boardId}/comment/${lastComment.id}/delete`);
+
+                        deleteButton.click(function () {
+                            deleteComment(lastComment.id);
+                        });
 
                         deleteButton.css('margin-left', '5.5px');
                         deleteButton.html('<i class="fas fa-trash"></i> 삭제');
@@ -271,6 +282,8 @@
 
                     // Get the comment container and append the comment card
                     const commentContainer = $('#comment-container');
+
+
                     commentContainer.append(commentCard);
                 });
         }

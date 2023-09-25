@@ -23,6 +23,8 @@ public class CommentDto {
 
     private int recommendCnt;
 
+    private Board board;
+
     public Comment toEntity() {
         return Comment.builder()
                 .writer(writer)

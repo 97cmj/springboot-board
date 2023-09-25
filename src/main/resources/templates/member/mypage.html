@@ -32,14 +32,14 @@
         <th:block th:if="${b.isEmpty()}">
           <tbody>
           <tr style="text-align : center">
-            <td colspan="3">게시글이 없습니다.</td>
+            <td colspan="4">게시글이 없습니다.</td>
           </tr>
           </tbody>
         </th:block>
 
         <th:block th:if="${!b.isEmpty()}">
           <tbody style="cursor:pointer">
-          <tr th:each="b : ${b}">
+          <tr class="board-tr" th:each="b : ${b}">
             <td th:text="${b.id}"></td>
             <td>
               <span th:text="${b.title}"></span>
@@ -74,17 +74,42 @@
 
         <th:block th:if="${!c.isEmpty()}">
           <tbody style="cursor:pointer">
-          <tr th:each="c : ${c}">
+          <tr class="content-tr" th:each="c : ${c}">
             <td th:text="${c.id}"></td>
             <td>
               <span th:text="${c.content}"></span>
             </td>
             <td th:text="${c.writer}"></td>
+
+            <input type="hidden" th:value="${c.getBoard().getId()}">
           </tr>
           </tbody>
         </th:block>
         </table>
     </div>
   </main>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+      $(".board-tr").click(function () {
+
+        const id = $(this).find("td:eq(0)").text();
+        location.href = "/board/" + id;
+      });
+
+      $(".content-tr").click(function () {
+
+        const commentId = $(this).find("td:eq(0)").text();
+        const boardId = $(this).find("input:eq(0)").val();
+
+        location.href = "/board/" + boardId +   '#comment-' + commentId;
+
+      });
+
+    });
+
+
+  </script>
 </th:block>
 </html>

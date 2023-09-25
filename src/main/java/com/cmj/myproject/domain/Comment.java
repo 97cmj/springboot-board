@@ -44,6 +44,7 @@ public class Comment extends BaseEntity {
                 .writerId(writerId)
                 .content(content)
                 .recommendCnt(recommendCnt)
+                .board(board)
                 .build();
     }
 

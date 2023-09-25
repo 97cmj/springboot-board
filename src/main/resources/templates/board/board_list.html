@@ -29,14 +29,14 @@
                                 <th:block th:if="${boardList.isEmpty()}">
                                     <tbody>
                                         <tr style="text-align : center">
-                                            <td colspan="3">게시글이 없습니다.</td>
+                                            <td colspan="4">게시글이 없습니다.</td>
                                         </tr>
                                     </tbody>
                                 </th:block>
 
                                 <th:block th:if="${!boardList.isEmpty()}">
                                     <tbody style="cursor:pointer">
-                                        <tr th:each="b : ${boardList}">
+                                        <tr class="board-tr" th:each="b : ${boardList}">
                                             <td th:text="${b.id}"></td>
                                             <td>
                                                 <span th:text="${b.title}"></span>
@@ -98,7 +98,7 @@
         <script th:inline="javascript">
             /*<![CDATA[*/
             $(document).ready(function () {
-                $("tr").click(function () {
+                $(".board-tr").click(function () {
 
                     var id = $(this).find("td:eq(0)").text();
                     const page = /*[[${boardList.getNumber+1}]]*/;
