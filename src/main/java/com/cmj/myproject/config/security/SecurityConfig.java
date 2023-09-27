@@ -28,6 +28,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private MyAuthenticationFailureHandler myAuthenticationFailureHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http

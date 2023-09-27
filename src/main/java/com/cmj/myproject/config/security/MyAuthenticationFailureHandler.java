@@ -2,7 +2,6 @@ package com.cmj.myproject.config.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
@@ -13,12 +12,13 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class MyAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler{
+public class MyAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info(">>>>>> 로그인 실패 : " + exception.getMessage() + " <<<<<<");
-        setDefaultFailureUrl("/login");
+        setDefaultFailureUrl("/login?error");
+
         super.onAuthenticationFailure(request, response, exception);
 
     }
