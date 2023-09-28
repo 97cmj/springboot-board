@@ -69,9 +69,6 @@ public class MemberController {
             List<BoardDto> b = boardService.findRecentBoardByEmail(email);
             List<CommentDto> c = boardService.findRecentCommentByEmail(email);
 
-            log.info("{}", b);
-            log.info("{}", c);
-
             mv.setViewName("member/mypage");
             mv.addObject("m", m);
             mv.addObject("b", b);

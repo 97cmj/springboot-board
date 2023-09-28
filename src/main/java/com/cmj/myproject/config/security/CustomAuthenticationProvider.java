@@ -1,8 +1,5 @@
 package com.cmj.myproject.config.security;
 
-import com.cmj.myproject.domain.Member;
-import com.cmj.myproject.dto.MemberResponseDto;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -10,14 +7,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpSession;
 
 @Component
 @Slf4j
@@ -30,22 +23,28 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private BCryptPasswordEncoder passwordEncoder;
 
 
-
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+        try {
+            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
 
+            if (userDetails == null) {
+                throw new Exception("아이디가 존재하지 않습니다.");
+            }
 
-        if (passwordEncoder.matches(password, userDetails.getPassword())) {
+            if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+                throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+            }
 
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-        } else {
-            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        } catch (UsernameNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 

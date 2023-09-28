@@ -16,7 +16,7 @@ public class MyAuthenticationFailureHandler extends SimpleUrlAuthenticationFailu
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.info(">>>>>> 로그인 실패 : " + exception.getMessage() + " <<<<<<");
+
         setDefaultFailureUrl("/login?error");
 
         super.onAuthenticationFailure(request, response, exception);
