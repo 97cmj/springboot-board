@@ -51,6 +51,10 @@ public class Board extends BaseEntity {
                 .writerId(writerId)
                 .viewCnt(viewCnt)
                 .recommendCnt(recommendCnt)
+                .createdBy(getCreatedBy())
+                .createdAt(getCreatedAt())
+                .modifiedAt(getModifiedAt())
+                .modifiedBy(getModifiedBy())
                 .build();
     }
 

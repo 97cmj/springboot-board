@@ -79,6 +79,10 @@
                         <p>작성자: <span th:text="${b.writer}"></span></p>
                         <p>조회수: <span th:text="${b.viewCnt}"></span></p>
                         <p>내용: <span th:text="${b.content}"></span></p>
+                        <p>작성일: <span th:text="${#temporals.format(b.createdAt, 'yyyy/MM/dd HH:mm:ss')}"></span></p>
+                        <th:block th:if="${b.modifiedAt != b.createdAt}">
+                            <p>수정일: <span th:text="${#temporals.format(b.modifiedAt, 'yyyy/MM/dd HH:mm:ss')}"></span></p>
+                        </th:block>
                     </div>
                 </div>
 
@@ -197,6 +201,7 @@
                     });
             }
         }
+
         function submitComment(event) {
             event.preventDefault(); // Prevent the default form submission
 
@@ -289,7 +294,7 @@
         }
 
 
-            function editComment(commentId) {
+        function editComment(commentId) {
             const commentText = $(`#comment-${commentId} .comment-text`);
             const commentTextarea = $(`#comment-${commentId} .comment-textarea`);
             const saveButton = $(`#comment-${commentId} .save-comment-btn`);

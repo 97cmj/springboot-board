@@ -26,6 +26,7 @@ public class BoardDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String createdBy;
+    private String modifiedBy;
 
     private List<Comment> comments;
 

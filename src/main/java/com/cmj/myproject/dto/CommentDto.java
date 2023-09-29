@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 @AllArgsConstructor
@@ -22,6 +24,12 @@ public class CommentDto {
     private String content;
 
     private int recommendCnt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
+
+    private String createdBy;
+    private String modifiedBy;
 
     private Board board;
 

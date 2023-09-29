@@ -44,7 +44,8 @@
                                             </td>
                                             <td th:text="${b.writer}"></td>
                                             <td th:text="${b.viewCnt}"></td>
-                                            <td th:text="${b.getCreatedAt()}"></td>
+                                            <td th:text="${#temporals.format(b.createdAt, 'yyyy/MM/dd HH:mm:ss')}"></td>
+
                                         </tr>
                                     </tbody>
                                 </th:block>

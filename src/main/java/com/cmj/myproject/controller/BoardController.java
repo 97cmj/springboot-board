@@ -19,6 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.cmj.myproject.util.ErrorUtil.*;
 
 import static com.cmj.myproject.util.ErrorUtil.setErrorModelAndView;
@@ -40,7 +42,9 @@ public class BoardController {
 
         try {
             Page<BoardDto> b = boardService.findAllBoard(pageable);
+
             mv.addObject("boardList", b);
+
             mv.setViewName("board/board_list");
 
         } catch (IllegalArgumentException e) {
