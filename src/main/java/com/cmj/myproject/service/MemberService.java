@@ -2,13 +2,10 @@ package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.domain.Role;
-import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.dto.MemberResponseDto;
-import com.cmj.myproject.exception.DuplicateEmailException;
 import com.cmj.myproject.repository.BoardRepository;
 import com.cmj.myproject.repository.MemberRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

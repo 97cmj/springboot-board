@@ -19,12 +19,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import com.cmj.myproject.util.ErrorUtil.*;
+
+import static com.cmj.myproject.util.ErrorUtil.setErrorModelAndView;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/board")
 public class BoardController {
+
+    private final String URL = "/board";
 
     private final BoardService boardService;
 
@@ -39,7 +44,7 @@ public class BoardController {
             mv.setViewName("board/board_list");
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv,e);
         }
 
         return mv;
@@ -148,15 +153,7 @@ public class BoardController {
         }
 
     }
-
-
-    private void setErrorModelAndView(ModelAndView mv, Exception e) {
-        mv.addObject("error", e.getMessage());
-        mv.addObject("url", "/board");
-        mv.setViewName("error/error");
-    }
-
-
+    
     //댓글 작성
     @PostMapping("{id}/comment")
     @ResponseBody
@@ -205,6 +202,12 @@ public class BoardController {
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public void setErrorModelAndView(ModelAndView mv, Exception e) {
+        mv.setViewName("error/error");
+        mv.addObject("error", e.getMessage());
+        mv.addObject("url", "/");
     }
 
 
