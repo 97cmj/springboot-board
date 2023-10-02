@@ -2,6 +2,7 @@ package com.cmj.myproject.dto;
 
 import com.cmj.myproject.domain.Board;
 import com.cmj.myproject.domain.Comment;
+import com.cmj.myproject.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class CommentDto {
     private String createdBy;
     private String modifiedBy;
 
-    private Board board;
+    private Post post;
 
     public Comment toEntity() {
         return Comment.builder()

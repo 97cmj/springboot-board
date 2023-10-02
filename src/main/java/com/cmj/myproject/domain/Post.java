@@ -1,7 +1,6 @@
 package com.cmj.myproject.domain;
 
 
-import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.PostDto;
 import lombok.*;
 
@@ -22,27 +21,31 @@ public class Post extends BaseEntity {
     @Column(name = "post_id", updatable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "post_title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "post_content", nullable = false)
     private String content;
 
-    @Column(name = "writer", nullable = false)
+    @Column(name = "post_writer", nullable = false)
     private String writer;
 
-    @Column(name = "writer_id", nullable = false)
+    @Column(name = "post_writer_id", nullable = false)
     private String writerId;
 
-    @Column(name = "view_cnt", nullable = false)
+    @Column(name = "post_view_cnt", nullable = false)
     private int viewCnt;
 
-    @Column(name = "recommend_cnt", nullable = false)
+    @Column(name = "post_recommend_cnt", nullable = false)
     private int recommendCnt;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 
     public PostDto toDto() {
         return PostDto.builder()

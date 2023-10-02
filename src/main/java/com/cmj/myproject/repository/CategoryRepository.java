@@ -1,11 +1,11 @@
 package com.cmj.myproject.repository;
 
-import com.cmj.myproject.domain.Board;
+import com.cmj.myproject.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Board findByName(String name);
+    Category findByName(String name);
 }

@@ -1,9 +1,14 @@
 package com.cmj.myproject.controller;
 
 import com.cmj.myproject.config.security.CustomUserDetails;
+import com.cmj.myproject.domain.Board;
+import com.cmj.myproject.domain.Category;
 import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
+import com.cmj.myproject.dto.PostDto;
 import com.cmj.myproject.service.BoardService;
+import com.cmj.myproject.service.CategoryService;
+import com.cmj.myproject.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,19 +27,22 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/board")
-public class BoardController {
+@RequestMapping("/b")
+public class PostController {
 
+    private final PostService postService;
+    private final CategoryService categoryService;
     private final BoardService boardService;
     private final HttpSession session;
 
     @GetMapping("")
-    public ModelAndView board(ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
-
+    public ModelAndView board(@PathVariable String category, ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
         try {
-            Page<BoardDto> b = boardService.findAllBoard(pageable);
 
-            mv.addObject("boardList", b);
+            Board b = boardService.findBoardByName(category);
+            Page<PostDto> p = postService.findPostByCategory(b, pageable);
+
+            mv.addObject("boardList", p);
 
             mv.setViewName("board/board_list");
 
@@ -65,10 +73,10 @@ public class BoardController {
     }
 
     @PostMapping("/write")
-    public ModelAndView write(BoardDto dto, ModelAndView mv) {
+    public ModelAndView write(PostDto dto, ModelAndView mv) {
 
         try {
-            boardService.save(dto);
+            postService.save(dto);
             mv.setViewName("redirect:/board/");
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
@@ -84,13 +92,13 @@ public class BoardController {
                                @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
-            BoardDto dto = boardService.findBoardById(id, session.getId());
+            PostDto dto = postService.findPostById(id, session.getId());
             mv.addObject("b", dto);
 
             mv.addObject("m", userDetails);
             mv.setViewName("board/board_detail");
 
-            List<CommentDto> commentList = boardService.findCommentList(id);
+            List<CommentDto> commentList = postService.findCommentList(id);
 
             mv.addObject("commentList", commentList);
 
@@ -104,7 +112,7 @@ public class BoardController {
     @GetMapping("{id}/update")
     public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            BoardDto dto = boardService.findBoardById(id, session.getId());
+            PostDto dto = postService.findPostById(id, session.getId());
 
             if (userDetails == null) {
                 throw new IllegalArgumentException("로그인이 필요합니다.");
@@ -124,10 +132,10 @@ public class BoardController {
     }
 
     @PostMapping("{id}/update")
-    public ModelAndView update(@PathVariable("id") Long id, BoardDto dto, ModelAndView mv) {
+    public ModelAndView update(@PathVariable("id") Long id, PostDto dto, ModelAndView mv) {
         try {
-            BoardDto updatedBoard = boardService.update(id, dto);
-            mv.setViewName("redirect:/board/" + updatedBoard.getId());
+            PostDto updatePost = postService.update(id, dto);
+            mv.setViewName("redirect:/board/" + updatePost.getId());
         } catch (IllegalArgumentException e) {
             setErrorModelAndView(mv, e);
         }
@@ -139,7 +147,7 @@ public class BoardController {
     @ResponseBody
     public ResponseEntity delete(@PathVariable("id") Long id) {
         try {
-            boardService.delete(id);
+            postService.delete(id);
             return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -155,8 +163,8 @@ public class BoardController {
     public ResponseEntity comment(@PathVariable("id") Long id, CommentDto dto) {
 
         try {
-            boardService.saveComment(id, dto);
-            List<CommentDto> commentList = boardService.findCommentList(id);
+            postService.saveComment(id, dto);
+            List<CommentDto> commentList = postService.findCommentList(id);
 
 
             return new ResponseEntity(commentList, HttpStatus.OK);
@@ -172,9 +180,9 @@ public class BoardController {
     public ResponseEntity updateComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId, CommentDto dto) {
 
         try {
-            boardService.updateComment(commentId, dto);
+            postService.updateComment(commentId, dto);
 
-            CommentDto comment = boardService.findCommentById(commentId);
+            CommentDto comment = postService.findCommentById(commentId);
 
             return new ResponseEntity(comment, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -189,7 +197,7 @@ public class BoardController {
     public ResponseEntity deleteComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId) {
 
         try {
-            boardService.deleteComment(commentId);
+            postService.deleteComment(commentId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

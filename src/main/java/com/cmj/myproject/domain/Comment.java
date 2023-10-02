@@ -1,6 +1,5 @@
 package com.cmj.myproject.domain;
 
-import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +8,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Comment extends BaseEntity {
 
     @Id
@@ -34,8 +33,8 @@ public class Comment extends BaseEntity {
     private int recommendCnt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Board board; // Represents the many-to-one relationship with Board
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     public CommentDto toDto() {
         return CommentDto.builder()
@@ -44,7 +43,7 @@ public class Comment extends BaseEntity {
                 .writerId(writerId)
                 .content(content)
                 .recommendCnt(recommendCnt)
-                .board(board)
+                .post(post)
                 .build();
     }
 

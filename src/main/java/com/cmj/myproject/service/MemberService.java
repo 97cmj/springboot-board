@@ -4,8 +4,8 @@ import com.cmj.myproject.domain.Member;
 import com.cmj.myproject.domain.Role;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.dto.MemberResponseDto;
-import com.cmj.myproject.repository.BoardRepository;
 import com.cmj.myproject.repository.MemberRepository;
+import com.cmj.myproject.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final BoardRepository boardRepository;
+    private final PostRepository postRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -46,7 +46,7 @@ public class MemberService {
     }
 
     private void validateDuplicateEmail(String email) {
-        if(memberRepository.existsByEmail(email)){
+        if (memberRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("중복된 이메일이 존재합니다.");
         }
     }

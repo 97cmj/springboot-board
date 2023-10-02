@@ -1,6 +1,7 @@
 package com.cmj.myproject.domain;
 
 
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,6 +34,15 @@ public abstract class BaseEntity {
     @LastModifiedBy
     @Column(name = "updated_by")
     private String modifiedBy;
+
+    @Column(name = "del_yn", nullable = false)
+    private String delYn = "N";
+
+    @Column(name = "use_yn", nullable = false)
+    private String useYn = "Y";
+
+
+
 
 
 }

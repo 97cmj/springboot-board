@@ -1,17 +1,20 @@
 package com.cmj.myproject.controller;
 
-import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.dto.MemberRequestDto;
 import com.cmj.myproject.dto.MemberResponseDto;
-import com.cmj.myproject.service.BoardService;
+import com.cmj.myproject.dto.PostDto;
 import com.cmj.myproject.service.MemberService;
+import com.cmj.myproject.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,10 +28,10 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
-    private final BoardService boardService;
+    private final PostService postService;
 
     @GetMapping("/signup")
-    public ModelAndView signUpForm(){
+    public ModelAndView signUpForm() {
         return new ModelAndView("member/signup");
     }
 
@@ -55,7 +58,7 @@ public class MemberController {
     }
 
     @GetMapping("/login")
-    public ModelAndView loginForm(Model model, HttpServletRequest request){
+    public ModelAndView loginForm(Model model, HttpServletRequest request) {
 
         return new ModelAndView("member/login");
     }
@@ -66,8 +69,8 @@ public class MemberController {
 
         try {
             MemberResponseDto m = memberService.findByEmail(email);
-            List<BoardDto> b = boardService.findRecentBoardByEmail(email);
-            List<CommentDto> c = boardService.findRecentCommentByEmail(email);
+            List<PostDto> b = postService.findRecentPostByEmail(email);
+            List<CommentDto> c = postService.findRecentCommentByEmail(email);
 
             mv.setViewName("member/mypage");
             mv.addObject("m", m);
