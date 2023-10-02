@@ -1,7 +1,6 @@
 package com.cmj.myproject.controller;
 
 import com.cmj.myproject.config.security.CustomUserDetails;
-import com.cmj.myproject.domain.Comment;
 import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.service.BoardService;
@@ -19,11 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.cmj.myproject.util.ErrorUtil.*;
-
-import static com.cmj.myproject.util.ErrorUtil.setErrorModelAndView;
 
 @Slf4j
 @Controller
@@ -31,10 +25,7 @@ import static com.cmj.myproject.util.ErrorUtil.setErrorModelAndView;
 @RequestMapping("/board")
 public class BoardController {
 
-    private final String URL = "/board";
-
     private final BoardService boardService;
-
     private final HttpSession session;
 
     @GetMapping("")
@@ -48,7 +39,7 @@ public class BoardController {
             mv.setViewName("board/board_list");
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv,e);
+            setErrorModelAndView(mv, e);
         }
 
         return mv;
@@ -63,7 +54,7 @@ public class BoardController {
             return mv;
         }
 
-        try{
+        try {
             mv.setViewName("board/board_write");
             mv.addObject("m", userDetails);
 
@@ -115,10 +106,10 @@ public class BoardController {
         try {
             BoardDto dto = boardService.findBoardById(id, session.getId());
 
-            if(userDetails == null){
+            if (userDetails == null) {
                 throw new IllegalArgumentException("로그인이 필요합니다.");
             }
-            if(!dto.getWriterId().equals(userDetails.getUsername())){
+            if (!dto.getWriterId().equals(userDetails.getUsername())) {
                 throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
             } else {
                 mv.addObject("b", dto);
@@ -157,7 +148,7 @@ public class BoardController {
         }
 
     }
-    
+
     //댓글 작성
     @PostMapping("{id}/comment")
     @ResponseBody
@@ -166,7 +157,6 @@ public class BoardController {
         try {
             boardService.saveComment(id, dto);
             List<CommentDto> commentList = boardService.findCommentList(id);
-
 
 
             return new ResponseEntity(commentList, HttpStatus.OK);
@@ -213,7 +203,6 @@ public class BoardController {
         mv.addObject("error", e.getMessage());
         mv.addObject("url", "/");
     }
-
 
 
 }
