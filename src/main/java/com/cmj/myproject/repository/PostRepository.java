@@ -24,5 +24,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findTop15ByWriterIdOrderByCreatedAtDesc(String email);
 
 
-    Page<Post> findByBoardName(String name, Pageable pageable);
+    Page<Post> findByBoardId(Long id, Pageable pageable);
 }

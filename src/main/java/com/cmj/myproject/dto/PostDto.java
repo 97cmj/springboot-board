@@ -30,6 +30,7 @@ public class PostDto {
     private String createdBy;
     private String modifiedBy;
 
+    private Board board;
     private List<Comment> comments;
 
     public Post toEntity() {
@@ -41,6 +42,7 @@ public class PostDto {
                 .writerId(writerId)
                 .viewCnt(viewCnt)
                 .recommendCnt(recommendCnt)
+                .board(board)
                 .build();
     }
 }

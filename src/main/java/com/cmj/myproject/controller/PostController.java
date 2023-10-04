@@ -2,12 +2,9 @@ package com.cmj.myproject.controller;
 
 import com.cmj.myproject.config.security.CustomUserDetails;
 import com.cmj.myproject.domain.Board;
-import com.cmj.myproject.domain.Category;
-import com.cmj.myproject.dto.BoardDto;
 import com.cmj.myproject.dto.CommentDto;
 import com.cmj.myproject.dto.PostDto;
 import com.cmj.myproject.service.BoardService;
-import com.cmj.myproject.service.CategoryService;
 import com.cmj.myproject.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,38 +24,43 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/b")
+@RequestMapping("/board")
 public class PostController {
 
     private final PostService postService;
-    private final CategoryService categoryService;
     private final BoardService boardService;
     private final HttpSession session;
 
-    @GetMapping("")
-    public ModelAndView board(@PathVariable String category, ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
+    @GetMapping(value = "/{url}", produces = "text/plain;charset=UTF-8")
+    public ModelAndView board(@PathVariable String url, ModelAndView mv, @PageableDefault(size = 10, page = 1) Pageable pageable) {
+
         try {
 
-            Board b = boardService.findBoardByName(category);
-            Page<PostDto> p = postService.findPostByCategory(b, pageable);
+            if (pageable.getPageNumber() == 0) {
+                throw new IllegalArgumentException("해당 페이지가 존재하지 않습니다.");
+            }
+
+            Board b = boardService.findBoardByUrl(url);
+            Page<PostDto> p = postService.findPostById(b, pageable);
 
             mv.addObject("boardList", p);
+            mv.addObject("board", b);
 
             mv.setViewName("board/board_list");
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
 
         return mv;
     }
 
-    @GetMapping("/write")
-    public ModelAndView write(ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    @GetMapping(value = "/{url}/write", produces = "text/plain;charset=UTF-8")
+    public ModelAndView write(@PathVariable String url, ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
 
         if (userDetails == null) {
-            setErrorModelAndView(mv, new IllegalArgumentException("로그인이 필요합니다."));
+            setErrorModelAndView(mv, url, new IllegalArgumentException("로그인이 필요합니다."));
             return mv;
         }
 
@@ -67,28 +69,28 @@ public class PostController {
             mv.addObject("m", userDetails);
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
         return mv;
     }
 
-    @PostMapping("/write")
-    public ModelAndView write(PostDto dto, ModelAndView mv) {
+    @PostMapping(value = "/{url}/write", produces = "text/plain;charset=UTF-8")
+    public ModelAndView write(@PathVariable String url, PostDto dto, ModelAndView mv) {
 
         try {
+            dto.setBoard(boardService.findBoardByUrl(url));
             postService.save(dto);
-            mv.setViewName("redirect:/board/");
+            mv.setViewName("redirect:/board/" + url);
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
 
         return mv;
     }
 
-
-    @GetMapping("{id}")
-    public ModelAndView detail(@PathVariable("id") Long id,
-                               @RequestParam(defaultValue = "1", value = "page") int page, ModelAndView mv,
+    @GetMapping(value = "/{url}/{id}", produces = "text/plain;charset=UTF-8")
+    public ModelAndView detail(@PathVariable("url") String url,
+                               @PathVariable("id") Long id, ModelAndView mv,
                                @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
@@ -103,14 +105,17 @@ public class PostController {
             mv.addObject("commentList", commentList);
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
 
         return mv;
     }
 
-    @GetMapping("{id}/update")
-    public ModelAndView update(@PathVariable("id") Long id, ModelAndView mv, @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    @GetMapping(value = "{url}/{id}/update", produces = "text/plain;charset=UTF-8")
+    public ModelAndView update(@PathVariable("url") String url,
+                               @PathVariable("id") Long id, ModelAndView mv,
+                               @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             PostDto dto = postService.findPostById(id, session.getId());
 
@@ -125,27 +130,30 @@ public class PostController {
             }
 
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
 
         return mv;
     }
 
-    @PostMapping("{id}/update")
-    public ModelAndView update(@PathVariable("id") Long id, PostDto dto, ModelAndView mv) {
+    @PostMapping(value = "{id}/update", produces = "text/plain;charset=UTF-8")
+    public ModelAndView update(@PathVariable("url") String url,
+                               @PathVariable("id") Long id,
+                               PostDto dto, ModelAndView mv) {
         try {
             PostDto updatePost = postService.update(id, dto);
-            mv.setViewName("redirect:/board/" + updatePost.getId());
+            mv.setViewName("redirect:/board/" + url + "/" + updatePost.getId());
         } catch (IllegalArgumentException e) {
-            setErrorModelAndView(mv, e);
+            setErrorModelAndView(mv, url, e);
         }
 
         return mv;
     }
 
-    @DeleteMapping("{id}/delete")
+    @DeleteMapping(value = "{id}/delete", produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public ResponseEntity delete(@PathVariable("id") Long id) {
+    public ResponseEntity delete(@PathVariable("url") String url,
+                                 @PathVariable("id") Long id) {
         try {
             postService.delete(id);
             return new ResponseEntity(HttpStatus.OK);
@@ -158,9 +166,11 @@ public class PostController {
     }
 
     //댓글 작성
-    @PostMapping("{id}/comment")
+    @PostMapping(value = "{url}/{id}/comment", produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public ResponseEntity comment(@PathVariable("id") Long id, CommentDto dto) {
+    public ResponseEntity comment(@PathVariable("url") String url,
+                                  @PathVariable("id") Long id,
+                                  CommentDto dto) {
 
         try {
             postService.saveComment(id, dto);
@@ -175,9 +185,12 @@ public class PostController {
         }
     }
 
-    @PostMapping("{id}/comment/{commentId}/update")
+    @PostMapping(value = "{url}/{id}/comment/{commentId}/update", produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public ResponseEntity updateComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId, CommentDto dto) {
+    public ResponseEntity updateComment(@PathVariable("url") String url,
+                                        @PathVariable("id") Long id,
+                                        @PathVariable("commentId") Long commentId,
+                                        CommentDto dto) {
 
         try {
             postService.updateComment(commentId, dto);
@@ -192,9 +205,11 @@ public class PostController {
         }
     }
 
-    @DeleteMapping("{id}/comment/{commentId}/delete")
+    @DeleteMapping(value = "/{url}/{id}/comment/{commentId}/delete", produces = "text/plain;charset=UTF-8")
     @ResponseBody
-    public ResponseEntity deleteComment(@PathVariable("id") Long id, @PathVariable("commentId") Long commentId) {
+    public ResponseEntity deleteComment(@PathVariable("url") String url,
+                                        @PathVariable("id") Long id,
+                                        @PathVariable("commentId") Long commentId) {
 
         try {
             postService.deleteComment(commentId);
@@ -206,10 +221,10 @@ public class PostController {
         }
     }
 
-    public void setErrorModelAndView(ModelAndView mv, Exception e) {
+    public void setErrorModelAndView(ModelAndView mv, String url, Exception e) {
         mv.setViewName("error/error");
         mv.addObject("error", e.getMessage());
-        mv.addObject("url", "/");
+        mv.addObject("url", "/board/" + url);
     }
 
 

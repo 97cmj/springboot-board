@@ -19,17 +19,17 @@ public class Board extends BaseEntity {
     @Column(name = "board_id", updatable = false)
     private Long id;
 
-    @Column(name = "board_name", nullable = false)
+    @Column(name = "board_name", nullable = false, unique = true)
     private String name;
 
     @Column(name = "board_description", nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(name = "board_url", nullable = false, unique = true)
+    private String url;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
 
 }

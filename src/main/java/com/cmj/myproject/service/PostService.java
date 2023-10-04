@@ -1,7 +1,6 @@
 package com.cmj.myproject.service;
 
 import com.cmj.myproject.domain.Board;
-import com.cmj.myproject.domain.Category;
 import com.cmj.myproject.domain.Comment;
 import com.cmj.myproject.domain.Post;
 import com.cmj.myproject.dto.CommentDto;
@@ -75,11 +74,11 @@ public class PostService {
     }
 
 
-    public Page<PostDto> findPostByCategory(Board board, Pageable pageable) {
+    public Page<PostDto> findPostById(Board board, Pageable pageable) {
 
         int page = (pageable.getPageNumber() == 0) ? 0 : (pageable.getPageNumber() - 1); // page는 index 처럼 0부터 시작
         pageable = PageRequest.of(page, 10, Sort.by("id").descending());
-        Page<Post> postList = postRepository.findByBoardName(board.getName(), pageable);
+        Page<Post> postList = postRepository.findByBoardId(board.getId(), pageable);
 
         //리퀘스트 페이지넘버가 보드리스트의 페이지넘버보다 크게 들어오면 에러가 발생한다.
         if (pageable.getPageNumber() > postList.getTotalPages()) {

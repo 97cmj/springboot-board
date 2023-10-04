@@ -14,4 +14,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/css/**", "/images/**", "/js/**");
     }
 
+
 }

@@ -6,11 +6,11 @@
         <div class="sb-nav-fixed">
             <div class="mt-5 pt-5">
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Board</h1>
+                    <h1 class="mt-4" th:text="${board.name}"></h1>
 
                     <div class="card mb-4">
                         <div class="card-header">
-                            <a class="btn btn-primary float-end" href="/board/write">
+                            <a class="btn btn-primary float-end" th:href="@{/board/{url}/write(url=${board.url})}">
                                 <!-- <i class="fas fa-table me-1"></i> -->
                                 <i class="fas fa-edit"></i> 글 작성
                             </a>
@@ -30,7 +30,7 @@
                                 <th:block th:if="${boardList.isEmpty()}">
                                     <tbody>
                                         <tr style="text-align : center">
-                                            <td colspan="4">게시글이 없습니다.</td>
+                                            <td colspan="5">게시글이 없습니다.</td>
                                         </tr>
                                     </tbody>
                                 </th:block>
@@ -57,37 +57,40 @@
                     <nav style="text-align: center;">
                         <ul class="pagination justify-content-center"
                             th:with="start=${T(java.lang.Math).floor(boardList.number/10)*10 + 1},
-        last=(${start + 9 < boardList.totalPages ? start + 9 : boardList.totalPages})">
+                               last=(${start + 9 < boardList.totalPages ? start + 9 : boardList.totalPages})">
 
                             <li class="page-item" th:class="${boardList.first} ? 'disabled'">
-                                <a class="page-link" th:href="@{/board(page=1)}" aria-label="First">
+                                <a class="page-link" th:href="@{/board/{url}(page=1, url=${board.url})}" aria-label="First">
                                     <span aria-hidden="true">&lt;&lt;</span>
                                 </a>
                             </li>
 
                             <li class="page-item" th:class="${boardList.first} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="${boardList.first} ? '#' :@{/board(page=${boardList.number})}"
+                                   th:href="${boardList.first} ? '#' :@{/board/{url}(page=${boardList.number}, url=${board.url})}"
                                    aria-label="Previous">
                                     <span aria-hidden="true">&lt;</span>
                                 </a>
                             </li>
 
+<!--                            th:href="@{/board/{url}/write(url=${board.url})}">-->
+
                             <li th:each="page: ${#numbers.sequence(start, last)}"
                                 th:class="${page == boardList.number + 1} ? 'active page-item' : 'page-item'">
-                                <a class="page-link" th:text="${page}" th:href="@{/board(page=${page})}"></a>
+                                <!-- 0 페이지인 경우에는 표시하지 않음 -->
+                                <a class="page-link" th:text="${page}" th:if="${page != 0}" th:href="@{/board/{url}(page=${page}, url=${board.url})}"></a>
                             </li>
 
                             <li class="page-item" th:class="${boardList.last} ? 'disabled'">
                                 <a class="page-link"
-                                   th:href="${boardList.last} ? '#' : @{/board(page=${boardList.number + 2})}"
+                                   th:href="${boardList.last} ? '#' : @{/board/{url}(page=${boardList.number + 2}, url=${board.url})}"
                                    aria-label="Next">
                                     <span aria-hidden="true">&gt;</span>
                                 </a>
                             </li>
 
                             <li class="page-item" th:class="${boardList.last} ? 'disabled'">
-                                <a class="page-link" th:href="@{/board(page=${boardList.totalPages})}"
+                                <a class="page-link" th:href="@{/board/{url}(page=${boardList.totalPages}, url=${board.url})}"
                                    aria-label="Last">
                                     <span aria-hidden="true">&gt;&gt;</span>
                                 </a>
@@ -105,7 +108,8 @@
 
                     var id = $(this).find("td:eq(0)").text();
                     const page = /*[[${boardList.getNumber+1}]]*/;
-                    location.href = "/board/" + id + "?page=" + page;
+                    const url = /*[[${board.url}]]*/;
+                    location.href = "/board/" + url + "/" + id + "?page=" + page;
                 });
             });
         </script>
