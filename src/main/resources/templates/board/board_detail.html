@@ -54,7 +54,7 @@
 
                     <div class="card-header">
 
-                        <a class="btn btn-primary float-end" th:href="@{/board(page=${p})}">
+                        <a class="btn btn-primary float-end" th:href="@{/board/{url}(page=${page}, url=${b.board.getUrl()})}">
                             <i class="fas fa-edit"></i> 글 목록
                         </a>
 
@@ -65,7 +65,7 @@
                             </a>
 
                             <a class="btn btn-primary float-end" style="margin-right : 10px;"
-                               th:href="@{/board/{id}/update(id=${b.getId})}">
+                               th:href="@{/board/{url}/{id}/update(id=${b.getId}, url=${b.board.getUrl()})}">
                                 <i class="fas fa-edit"></i> 글 수정
                             </a>
 
@@ -184,14 +184,15 @@
         function deleteBoard() {
             if (confirm("정말 삭제하시겠습니까?")) {
                 const id = /*[[${b.id}]]*/;
+                const url = /*[[${b.board.getUrl()}]]*/;
 
-                fetch('/board/' + id + '/delete', {
+                fetch('/board/' + url + "/" +  id + '/delete', {
                     method: 'DELETE'
                 })
                     .then(response => {
                         if (response.ok) {
                             alert("삭제 완료");
-                            location.href = "/board";
+                            location.href = "/board/" + url;
                         } else {
                             console.error("삭제 실패");
                         }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -91,10 +92,17 @@ public class PostController {
     @GetMapping(value = "/{url}/{id}", produces = "text/plain;charset=UTF-8")
     public ModelAndView detail(@PathVariable("url") String url,
                                @PathVariable("id") Long id, ModelAndView mv,
-                               @AuthenticationPrincipal CustomUserDetails userDetails) {
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               HttpServletRequest request) {
 
         try {
             PostDto dto = postService.findPostById(id, session.getId());
+            dto.setBoard(boardService.findBoardByUrl(url));
+
+            String page = request.getParameter("page");
+
+            mv.addObject("page", page);
+
             mv.addObject("b", dto);
 
             mv.addObject("m", userDetails);
