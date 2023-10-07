@@ -27,7 +27,6 @@ public class BoardController {
     @RequestMapping("/list")
     public List<Board> list(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-
         //어드민인지 체크
         List<Board> list = null;
         if (userDetails.getAuthorities().toString().equals("[ADMIN]")) {
@@ -53,6 +52,8 @@ public class BoardController {
 
         return map;
     }
+
+
 
 
 }

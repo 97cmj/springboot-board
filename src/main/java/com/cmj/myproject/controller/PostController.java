@@ -144,7 +144,7 @@ public class PostController {
         return mv;
     }
 
-    @PostMapping(value = "{id}/update", produces = "text/plain;charset=UTF-8")
+    @PostMapping(value = "{url}/{id}/update", produces = "text/plain;charset=UTF-8")
     public ModelAndView update(@PathVariable("url") String url,
                                @PathVariable("id") Long id,
                                PostDto dto, ModelAndView mv) {
@@ -158,7 +158,7 @@ public class PostController {
         return mv;
     }
 
-    @DeleteMapping(value = "{id}/delete", produces = "text/plain;charset=UTF-8")
+    @DeleteMapping(value = "{url}/{id}/delete", produces = "text/plain;charset=UTF-8")
     @ResponseBody
     public ResponseEntity delete(@PathVariable("url") String url,
                                  @PathVariable("id") Long id) {
