@@ -208,10 +208,11 @@
 
             const formData = new FormData(document.getElementById('commentForm'));
             const boardId = /*[[${b.id}]]*/;
+            const url = /*[[${b.board.getUrl()}]]*/;
 
             $('#commentForm').find('textarea').val('');
 
-            fetch(`/board/${boardId}/comment`, {
+            fetch(`/board/${url}/${boardId}/comment`, {
                 method: 'POST',
                 body: formData,
             })
