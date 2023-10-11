@@ -32,7 +32,7 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private int recommendCnt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
     private Post post;
 

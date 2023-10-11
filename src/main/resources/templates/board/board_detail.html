@@ -207,12 +207,12 @@
             event.preventDefault(); // Prevent the default form submission
 
             const formData = new FormData(document.getElementById('commentForm'));
-            const boardId = /*[[${b.id}]]*/;
-            const url = /*[[${b.board.getUrl()}]]*/;
+            let boardId = /*[[${b.id}]]*/;
 
             $('#commentForm').find('textarea').val('');
 
-            fetch(`/board/${url}/${boardId}/comment`, {
+            fetch(`/board/${boardId}/comment`, {
+
                 method: 'POST',
                 body: formData,
             })
@@ -232,7 +232,7 @@
 
                     // Display writer's name in a gray box
                     const writerBox = $('<div>').addClass('writer-box');
-                    writerBox.html('<p><span>' + lastComment.writer + ' ' + '</span><i class="fas fa-user"></i></p>');
+                    writerBox.html('<p><span>' + lastComment.post.writer + ' ' + '</span><i class="fas fa-user"></i></p>');
 
                     commentHeader.append(writerBox);
 
@@ -325,11 +325,12 @@
             const editButton = $(`#comment-${commentId} .edit-comment-btn`);
             const deleteButton = $(`#comment-${commentId} .delete-comment-btn`);
             const b = /*[[${b.id}]]*/;
+            const url = /*[[${b.board.getUrl()}]]*/;
 
             const formData = new FormData();
             formData.append('content', commentTextarea.val());
 
-            fetch(`/board/${b}/comment/${commentId}/update`, {
+            fetch(`/board/${url}/${b}/comment/${commentId}/update`, {
                 method: 'POST',
                 body: formData,
             })

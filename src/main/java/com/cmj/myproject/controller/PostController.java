@@ -174,15 +174,17 @@ public class PostController {
     }
 
     //댓글 작성
-    @PostMapping(value = "{url}/{id}/comment", produces = "text/plain;charset=UTF-8")
+    @PostMapping(value = "{id}/comment")
     @ResponseBody
-    public ResponseEntity comment(@PathVariable("url") String url,
+    public ResponseEntity comment(
                                   @PathVariable("id") Long id,
                                   CommentDto dto) {
 
         try {
             postService.saveComment(id, dto);
             List<CommentDto> commentList = postService.findCommentList(id);
+
+            log.info("commentList = {}", commentList);
 
 
             return new ResponseEntity(commentList, HttpStatus.OK);
@@ -193,7 +195,7 @@ public class PostController {
         }
     }
 
-    @PostMapping(value = "{url}/{id}/comment/{commentId}/update", produces = "text/plain;charset=UTF-8")
+    @PostMapping(value = "{url}/{id}/comment/{commentId}/update")
     @ResponseBody
     public ResponseEntity updateComment(@PathVariable("url") String url,
                                         @PathVariable("id") Long id,
@@ -213,7 +215,7 @@ public class PostController {
         }
     }
 
-    @DeleteMapping(value = "/{url}/{id}/comment/{commentId}/delete", produces = "text/plain;charset=UTF-8")
+    @DeleteMapping(value = "/{url}/{id}/comment/{commentId}/delete")
     @ResponseBody
     public ResponseEntity deleteComment(@PathVariable("url") String url,
                                         @PathVariable("id") Long id,
